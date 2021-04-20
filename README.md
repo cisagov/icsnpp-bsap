@@ -8,7 +8,7 @@ ICSNPP-BSAP is a Zeek plugin for parsing and logging fields within the BSAP (Bri
 
 This plugin was developed to be fully customizable, so if you would like to drill down into specific BSAP packets and log certain variables, add the logging functionality to [scripts/main.zeek](scripts/main.zeek). The functions within [scripts/main.zeek](scripts/main.zeek) and [src/events.bif](src/events.bif) should prove to be a good guide on how to add new logging functionality.
 
-This parser produces three log files. These log files are defined in [scripts/main.zeek](scripts/main.zeek).
+This parser produces seven log files. These log files are defined in [scripts/main.zeek](scripts/main.zeek).
 * bsap_ip_header.log
 * bsap_ip_rdb.log
 * bsap_ip_unknown.log 
