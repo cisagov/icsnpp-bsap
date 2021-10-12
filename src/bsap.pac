@@ -7,8 +7,8 @@
 ##
 ## Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
 
-%include binpac.pac
-%include bro.pac
+%include zeek/binpac.pac
+%include zeek/zeek.pac
 
 %extern{
     #include "events.bif.h"
@@ -19,7 +19,7 @@ analyzer BSAP withcontext {
     flow:       BSAP_Flow;
 };
 
-connection BSAP_Conn(bro_analyzer: BroAnalyzer) {
+connection BSAP_Conn(zeek_analyzer: ZeekAnalyzer) {
     upflow   = BSAP_Flow(true);
     downflow = BSAP_Flow(false);
 };

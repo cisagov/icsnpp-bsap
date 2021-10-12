@@ -12,7 +12,7 @@
      typedef struct RDB_Request {
         uint8 variable_cnt;
         uint8 err;
-        string variable_value; 
+        string variable_value;
         string variables;
 
         RDB_Request(){
@@ -31,9 +31,9 @@
     extern uint32 req_len;
     string HexToString(const_bytestring data, uint16 len, uint16 pos);
     void setFunc(uint8 func);
-    RDB_Request getRdb(uint8 req_resp, uint8 cnt, uint8 func, 
+    RDB_Request getRdb(uint8 req_resp, uint8 cnt, uint8 func,
                        uint8 proto_type, const_bytestring data);
-    void setResponseId(uint8 function, uint32 ResponseSeqID, 
+    void setResponseId(uint8 function, uint32 ResponseSeqID,
                        uint32 MessageSeqID, uint32 MessageLen);
     uint32 checkResponse(uint32 Responder);
     uint32 getResponseID();
@@ -71,13 +71,13 @@
 
                 count += 2;
                 }
-            
+
             buf[count] = 0x00;
 
             string r_val;
             r_val += buf;
             return r_val;
-            } 
+            }
         return NULL;
         }
 
@@ -86,7 +86,7 @@
         FuncType = func;
         }
 
-    RDB_Request getRdb(uint8 req_resp, uint8 cnt, uint8 func, 
+    RDB_Request getRdb(uint8 req_resp, uint8 cnt, uint8 func,
                        uint8 proto_type, const_bytestring data)
         {
         RDB_Request rdb_request;
@@ -95,13 +95,13 @@
         switch(func)
             {
             case READ_SIGNAL_BY_ADDRESS:
-                
+
                 break;
             case READ_LOGICAL_BY_ADDRESS:
-                
+
                 break;
             case READ_SIGNAL_BY_NAME:
-                
+
 
                 if(proto_type) // serial
                     {
@@ -120,7 +120,7 @@
                         rdb_request.variable_cnt = data[4];
                     }
 
-                
+
                 z = 0;
 
                 if(req_resp)
@@ -178,7 +178,7 @@
                                             }
                                     }
                                     z+=2;
-                                    
+
                             }
                         }
                     else
@@ -191,14 +191,14 @@
                                 do
                                 {
                                     testval = data[z];
-                                    if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) || 
+                                    if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) ||
                                        ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                         {
                                             errset = 1;
                                             rdb_request.variable_value += "Errdata 0x";
                                             rdb_request.variable_value += HexToString(data, 1, z);
                                             rdb_request.variable_value += " ";
-                                            
+
                                         }
                                     z++;
 
@@ -231,7 +231,7 @@
                         while(data[z] != '@' && z < data.length())
                         {
                             z++;
-                            
+
                         }
 
                         if(data[z] == '@')
@@ -249,29 +249,29 @@
 
                 break;
             case READ_LOGICAL_BY_NAME:
-                
+
                 break;
             case READ_SIGNAL_BY_LIST_START:
-                
+
                 break;
             case READ_SIGNAL_BY_LIST_CONTINUE:
-                
+
                 break;
             case READ_LOGICAL_BY_LIST_START:
-                
+
                 break;
             case READ_LOGICAL_BY_LIST_CONTINUE:
-                
+
                 break;
             case WRITE_SIGNAL_BY_ADDRESS:
-                
+
 
                 if(req_resp)
                 {
                     if(data.length())
                         {
                         rdb_request.variable_value = HexToString(data, 2, data.length());
-                        
+
                         }
                     rdb_request.variables = response_addr;
 
@@ -298,8 +298,8 @@
                         response_addr = rdb_request.variables;
                         rdb_request.variable_value += HexToString(data, 1, z);
 
-                        
-                        
+
+
                         z++;
                         if((z > data.length()))
                             break;
@@ -338,12 +338,12 @@
                             {
                             z = 0;
                             uint8 errset = 0;
-                            
+
                             uint8 testval;
                             do
                             {
                                 testval = data[z];
-                                if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) || 
+                                if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) ||
                                    ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                     {
                                         errset = 1;
@@ -375,12 +375,12 @@
                         {
                         z = 0;
                         uint8 errset = 0;
-                        
+
                         uint8 testval;
                         do
                         {
                             testval = data[z];
-                            if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) || 
+                            if(((testval & 0x10) >> 4 == 1) || ((testval & 0x20) >> 5 == 1) ||
                                ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                 {
                                     errset = 1;
@@ -406,7 +406,7 @@
                             }
                         rdb_request.variable_value += ", ";
                         errset = 0;
-                            
+
                         }
                     }
                 else
@@ -418,7 +418,7 @@
                         while(data[z] != '@' && z < data.length())
                         {
                             z++;
-                            
+
                         }
 
                         if(data[z] == '@')
@@ -436,10 +436,10 @@
 
                 break;
             case WRITE_SIGNAL_BY_LIST_START:
-                
+
                 break;
             case WRITE_SIGNAL_BY_LIST_CONTINUE:
-                
+
                 break;
             }
 
@@ -488,7 +488,7 @@
 refine flow BSAP_Flow += {
 
     function proc_bsap_message(bsap_header: BSAP_PDU): bool
-        %{  
+        %{
             return true;
         %}
 
@@ -496,22 +496,22 @@ refine flow BSAP_Flow += {
     ###########################  Process data for bsapip_header event  ############################
     ###############################################################################################
     function proc_bsapip_ip_message(bsapip_header: BSAPIP_Ip): bool
-       %{  
+       %{
             if( :: bsap_ip_header)
                 {
-                BifEvent::generate_bsap_ip_header(connection()->bro_analyzer(),
-                                             connection()->bro_analyzer()->Conn(),
-                                             is_orig(),
-                                             ${bsapip_header.header.Num_Messages},
-                                             ${bsapip_header.header.Num_Messages},
-                                             ${bsapip_header.header.Message_Func});
+                zeek::BifEvent::enqueue_bsap_ip_header(connection()->zeek_analyzer(),
+                                                        connection()->zeek_analyzer()->Conn(),
+                                                        is_orig(),
+                                                        ${bsapip_header.header.Num_Messages},
+                                                        ${bsapip_header.header.Num_Messages},
+                                                        ${bsapip_header.header.Message_Func});
                 }
             return true;
        %}
 
     ###############################################################################################
     ######################  Process data for proc_bsapip_request_header event  ######################
-    ############################################################################################### 
+    ###############################################################################################
     function proc_bsapip_request_header(bsapip_request_header: BSAPIP_Request_Header): bool
        %{
             setResponseId(${bsapip_request_header.app_func_code},${bsapip_request_header.sequence},
@@ -519,14 +519,14 @@ refine flow BSAP_Flow += {
 
             if( :: bsap_ip_request_header)
             {
-                BifEvent::generate_bsap_ip_request_header(connection()->bro_analyzer(),
-                                                       connection()->bro_analyzer()->Conn(),
-                                                       ${bsapip_request_header.response_seq},
-                                                       ${bsapip_request_header.message_seq},
-                                                       ${bsapip_request_header.data_length},
-                                                       ${bsapip_request_header.header_size},
-                                                       ${bsapip_request_header.sequence},
-                                                       ${bsapip_request_header.app_func_code});
+                zeek::BifEvent::enqueue_bsap_ip_request_header(connection()->zeek_analyzer(),
+                                                                connection()->zeek_analyzer()->Conn(),
+                                                                ${bsapip_request_header.response_seq},
+                                                                ${bsapip_request_header.message_seq},
+                                                                ${bsapip_request_header.data_length},
+                                                                ${bsapip_request_header.header_size},
+                                                                ${bsapip_request_header.sequence},
+                                                                ${bsapip_request_header.app_func_code});
             }
             return true;
        %}
@@ -547,17 +547,17 @@ refine flow BSAP_Flow += {
 
             if( ::bsap_ip_rdb_request )
             {
-                BifEvent::generate_bsap_ip_rdb_request(connection()->bro_analyzer(),
-                                                      connection()->bro_analyzer()->Conn(),
-                                                      response_id,
-                                                      message_id,
-                                                      ${bsapip_rdb_request.node_status},
-                                                      ${bsapip_rdb_request.func_code},
-                                                      req_len,
-                                                      rdb_request.variable_cnt,
-                                                      new StringVal(rdb_request.variables),
-                                                      new StringVal(rdb_request.variable_value),
-                                                      bytestring_to_val(${bsapip_rdb_request.data}));
+                zeek::BifEvent::enqueue_bsap_ip_rdb_request(connection()->zeek_analyzer(),
+                                                             connection()->zeek_analyzer()->Conn(),
+                                                             response_id,
+                                                             message_id,
+                                                             ${bsapip_rdb_request.node_status},
+                                                             ${bsapip_rdb_request.func_code},
+                                                             req_len,
+                                                             rdb_request.variable_cnt,
+                                                             zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
+                                                             zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                             to_stringval(${bsapip_rdb_request.data}));
             }
             return true;
       %}
@@ -566,7 +566,7 @@ refine flow BSAP_Flow += {
     ########################  Process data for proc_bsapip_response event  ########################
     ###############################################################################################
     function proc_bsapip_response(bsap_response: BSAPIP_Response): bool
-       %{ 
+       %{
             uint32 response_status = 0;
             uint32 app_code = 0;
 
@@ -579,21 +579,21 @@ refine flow BSAP_Flow += {
             switch(app_code)
             {
                 case RDB:
-                    if( ::bsap_ip_rdb_response ) 
+                    if( ::bsap_ip_rdb_response )
                     {
-                       BifEvent::generate_bsap_ip_rdb_response(connection()->bro_analyzer(),
-                                                              connection()->bro_analyzer()->Conn(),
-                                                              ${bsap_response.message_seq},
-                                                              ${bsap_response.response_seq},
-                                                              ${bsap_response.data_length},
-                                                              ${bsap_response.header_size},
-                                                              ${bsap_response.sequence},
-                                                              response_status,
-                                                              ${bsap_response.resp_status},
-                                                              new StringVal(rdb_request.variables),
-                                                              new StringVal(rdb_request.variable_value),
-                                                              ${bsap_response.nme},
-                                                              bytestring_to_val(${bsap_response.data}));
+                       zeek::BifEvent::enqueue_bsap_ip_rdb_response(connection()->zeek_analyzer(),
+                                                                     connection()->zeek_analyzer()->Conn(),
+                                                                     ${bsap_response.message_seq},
+                                                                     ${bsap_response.response_seq},
+                                                                     ${bsap_response.data_length},
+                                                                     ${bsap_response.header_size},
+                                                                     ${bsap_response.sequence},
+                                                                     response_status,
+                                                                     ${bsap_response.resp_status},
+                                                                     zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
+                                                                     zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                     ${bsap_response.nme},
+                                                                     to_stringval(${bsap_response.data}));
                     }
                     break;
             }
@@ -607,9 +607,9 @@ refine flow BSAP_Flow += {
         %{
             if( ::bsap_ip_unknown )
             {
-               BifEvent::generate_bsap_ip_unknown(connection()->bro_analyzer(),
-                                                 connection()->bro_analyzer()->Conn(),
-                                                 bytestring_to_val(${bsapip_unknown.data}));
+               zeek::BifEvent::enqueue_bsap_ip_unknown(connection()->zeek_analyzer(),
+                                                        connection()->zeek_analyzer()->Conn(),
+                                                        to_stringval(${bsapip_unknown.data}));
             }
             return true;
         %}
@@ -625,13 +625,13 @@ refine flow BSAP_Flow += {
             {
                 setResponseId(${bsap_serial_local_header.DFUN}, ${bsap_serial_local_header.SEQ}, 0, 0);
 
-                BifEvent::generate_bsap_serial_local_header(connection()->bro_analyzer(),
-                                                     connection()->bro_analyzer()->Conn(),
-                                                     ${bsap_serial_local_header.SER},
-                                                     ${bsap_serial_local_header.DFUN},
-                                                     ${bsap_serial_local_header.SEQ},
-                                                     ${bsap_serial_local_header.SFUN},
-                                                     ${bsap_serial_local_header.NSB});
+                zeek::BifEvent::enqueue_bsap_serial_local_header(connection()->zeek_analyzer(),
+                                                                  connection()->zeek_analyzer()->Conn(),
+                                                                  ${bsap_serial_local_header.SER},
+                                                                  ${bsap_serial_local_header.DFUN},
+                                                                  ${bsap_serial_local_header.SEQ},
+                                                                  ${bsap_serial_local_header.SFUN},
+                                                                  ${bsap_serial_local_header.NSB});
             }
             return true;
       %}
@@ -642,16 +642,16 @@ refine flow BSAP_Flow += {
       %{
             if( ::bsap_serial_global_header)
             {
-                BifEvent::generate_bsap_serial_global_header(connection()->bro_analyzer(),
-                                                      connection()->bro_analyzer()->Conn(),
-                                                      ${bsap_serial_global_header.SER},
-                                                      ${bsap_serial_global_header.DADD},
-                                                      ${bsap_serial_global_header.SADD},
-                                                      ${bsap_serial_global_header.CTL},
-                                                      ${bsap_serial_global_header.DFUN},
-                                                      ${bsap_serial_global_header.SEQ},
-                                                      ${bsap_serial_global_header.SFUN},
-                                                      ${bsap_serial_global_header.NSB});
+                zeek::BifEvent::enqueue_bsap_serial_global_header(connection()->zeek_analyzer(),
+                                                                   connection()->zeek_analyzer()->Conn(),
+                                                                   ${bsap_serial_global_header.SER},
+                                                                   ${bsap_serial_global_header.DADD},
+                                                                   ${bsap_serial_global_header.SADD},
+                                                                   ${bsap_serial_global_header.CTL},
+                                                                   ${bsap_serial_global_header.DFUN},
+                                                                   ${bsap_serial_global_header.SEQ},
+                                                                   ${bsap_serial_global_header.SFUN},
+                                                                   ${bsap_serial_global_header.NSB});
             }
             return true;
       %}
@@ -661,21 +661,21 @@ refine flow BSAP_Flow += {
     ###############################################################################################
     function proc_bsap_serial_rdb_request(bsap_serial_rdb_request: BSAP_Serial_RDB_Request): bool
       %{
-            
+
             RDB_Request rdb_request;
             setFunc(${bsap_serial_rdb_request.func_code});
             rdb_request = getRdb(0, 0, ${bsap_serial_rdb_request.func_code}, 1, ${bsap_serial_rdb_request.data});
-           
+
 
             if( ::bsap_serial_rdb_request )
             {
-                BifEvent::generate_bsap_serial_rdb_request(connection()->bro_analyzer(),
-                                                    connection()->bro_analyzer()->Conn(),
-                                                    ${bsap_serial_rdb_request.func_code},
-                                                    rdb_request.variable_cnt,
-                                                    new StringVal(rdb_request.variables),
-                                                    new StringVal(rdb_request.variable_value),
-                                                    bytestring_to_val(${bsap_serial_rdb_request.data}));
+                zeek::BifEvent::enqueue_bsap_serial_rdb_request(connection()->zeek_analyzer(),
+                                                                 connection()->zeek_analyzer()->Conn(),
+                                                                 ${bsap_serial_rdb_request.func_code},
+                                                                 rdb_request.variable_cnt,
+                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
+                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                 to_stringval(${bsap_serial_rdb_request.data}));
             }
             return true;
       %}
@@ -695,13 +695,13 @@ refine flow BSAP_Flow += {
 
             if( ::bsap_serial_rdb_response )
             {
-               BifEvent::generate_bsap_serial_rdb_response(connection()->bro_analyzer(),
-                                                    connection()->bro_analyzer()->Conn(),
-                                                    response_status,
-                                                    rdb_request.variable_cnt,
-                                                    new StringVal(rdb_request.variables),
-                                                    new StringVal(rdb_request.variable_value),
-                                                    bytestring_to_val(${bsap_serial_response.data}));
+               zeek::BifEvent::enqueue_bsap_serial_rdb_response(connection()->zeek_analyzer(),
+                                                                 connection()->zeek_analyzer()->Conn(),
+                                                                 response_status,
+                                                                 rdb_request.variable_cnt,
+                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
+                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                 to_stringval(${bsap_serial_response.data}));
             }
             return true;
        %}
@@ -713,14 +713,14 @@ refine flow BSAP_Flow += {
         %{
             if( ::bsap_serial_rdb_extension )
             {
-               BifEvent::generate_bsap_serial_rdb_extension(connection()->bro_analyzer(),
-                                                     connection()->bro_analyzer()->Conn(),
-                                                     ${bsap_serial_rdb_extension.DFUN},
-                                                     ${bsap_serial_rdb_extension.SEQ},
-                                                     ${bsap_serial_rdb_extension.SFUN},
-                                                     ${bsap_serial_rdb_extension.NSB},
-                                                     ${bsap_serial_rdb_extension.XFUN},
-                                                     bytestring_to_val(${bsap_serial_rdb_extension.data}));
+               zeek::BifEvent::enqueue_bsap_serial_rdb_extension(connection()->zeek_analyzer(),
+                                                                  connection()->zeek_analyzer()->Conn(),
+                                                                  ${bsap_serial_rdb_extension.DFUN},
+                                                                  ${bsap_serial_rdb_extension.SEQ},
+                                                                  ${bsap_serial_rdb_extension.SFUN},
+                                                                  ${bsap_serial_rdb_extension.NSB},
+                                                                  ${bsap_serial_rdb_extension.XFUN},
+                                                                  to_stringval(${bsap_serial_rdb_extension.data}));
             }
             return true;
        %}
@@ -734,9 +734,9 @@ refine flow BSAP_Flow += {
         %{
             if( ::bsap_serial_unknown )
             {
-               BifEvent::generate_bsap_serial_unknown(connection()->bro_analyzer(),
-                                               connection()->bro_analyzer()->Conn(),
-                                               bytestring_to_val(${bsap_serial_unknown.data}));
+               zeek::BifEvent::enqueue_bsap_serial_unknown(connection()->zeek_analyzer(),
+                                                            connection()->zeek_analyzer()->Conn(),
+                                                            to_stringval(${bsap_serial_unknown.data}));
             }
             return true;
         %}
