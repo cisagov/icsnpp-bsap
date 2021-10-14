@@ -7,4 +7,4 @@ credits = Devin Vollmer <devin.vollmer@inl.gov>
 tags =  bsap, BSAP, ics, ICS, CISA, INL, ICSNPP, icsnpp, zeek plugin, log writer, protocol analyzer
 depends =
   zkg >=2.0
-  zeek >=3.0.0
+  zeek >=4.0.0

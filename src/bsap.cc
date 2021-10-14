@@ -1,12 +1,12 @@
 // Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
 
 #include "bsap.h"
-#include "Reporter.h"
+#include <zeek/Reporter.h>
 #include "events.bif.h"
 
 using namespace analyzer::BSAP;
 
-BSAP_Analyzer::BSAP_Analyzer(Connection* c): analyzer::Analyzer("BSAP", c)
+BSAP_Analyzer::BSAP_Analyzer(zeek::Connection* c): zeek::analyzer::Analyzer("BSAP", c)
 {
     interp = new binpac::BSAP::BSAP_Conn(this);
 }
@@ -21,7 +21,7 @@ void BSAP_Analyzer::Done()
     Analyzer::Done();
 }
 
-void BSAP_Analyzer::DeliverPacket(int len, const u_char* data, bool orig, uint64 seq, const IP_Hdr* ip, int caplen)
+void BSAP_Analyzer::DeliverPacket(int len, const u_char* data, bool orig, uint64_t seq, const zeek::IP_Hdr* ip, int caplen)
 {
     Analyzer::DeliverPacket(len, data, orig, seq, ip, caplen);
 
@@ -31,6 +31,6 @@ void BSAP_Analyzer::DeliverPacket(int len, const u_char* data, bool orig, uint64
     }
     catch ( const binpac::Exception& e )
     {
-        ProtocolViolation(fmt("Binpac exception: %s", e.c_msg()));
+        ProtocolViolation(zeek::util::fmt("Binpac exception: %s", e.c_msg()));
     }
 }
