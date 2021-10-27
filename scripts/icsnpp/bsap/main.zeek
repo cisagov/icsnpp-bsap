@@ -1,10 +1,10 @@
 ##! main.zeek
 ##!
-##! Binpac BSAP (BSAP) Analyzer - Contains the base script-layer functionality for 
+##! Binpac BSAP (BSAP) Analyzer - Contains the base script-layer functionality for
 ##!                               processing events emitted from the analyzer.
-##!                               For use with BSAP communication over serial 
+##!                               For use with BSAP communication over serial
 ##!                               using serial to ethernet tap, or for use with
-##!                               BSAP communication over ethernet directly. 
+##!                               BSAP communication over ethernet directly.
 ##!
 ##!
 ##! Author:  Devin Vollmer
@@ -15,12 +15,12 @@
 module Bsap;
 
 export {
-    redef enum Log::ID += { LOG_BSAP_IP, 
-                            LOG_BSAP_IP_RDB, 
+    redef enum Log::ID += { LOG_BSAP_IP,
+                            LOG_BSAP_IP_RDB,
                             LOG_BSAP_IP_UNKNOWN,
-                            LOG_BSAP_SERIAL_HEADER, 
-                            LOG_BSAP_SERIAL_RDB, 
-                            LOG_BSAP_SERIAL_RDB_EXT, 
+                            LOG_BSAP_SERIAL_HEADER,
+                            LOG_BSAP_SERIAL_RDB,
+                            LOG_BSAP_SERIAL_RDB_EXT,
                             LOG_BSAP_SERIAL_UNKNOWN};
 
     ###############################################################################################
@@ -77,7 +77,7 @@ export {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
         id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        ser             : count     &log;                   
+        ser             : count     &log;
         dadd            : count     &log;
         sadd            : count     &log;
         ctl             : count     &log;
@@ -137,7 +137,7 @@ export {
 }
 
 #port 1234,1235 are default port numbers used by BSAPIPDRV
-const ports = { 1234/udp, 
+const ports = { 1234/udp,
                 1235/udp
 };
 
@@ -161,12 +161,21 @@ event zeek_init() &priority=5
     Analyzer::register_for_ports(Analyzer::ANALYZER_BSAP, ports);
     }
 
+###################################################################################################
+#######  Ensure that conn.log:service is set if it has not already been                     #######
+###################################################################################################
+function set_service(c: connection) {
+  if ((!c?$service) || (|c$service| == 0))
+    add c$service["bsap"];
+}
+
 ###############################################################################################
 ################ Defines logging of bsap_ip_header event -> bsap_ip_header.log  #################
 ###############################################################################################
-event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: count, 
+event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: count,
                     Message_Func: count)
     {
+    set_service(c);
     local info: BSAP_IP_Header;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -176,18 +185,19 @@ event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: coun
     #info$mes_seq = message_seq;
     #info$res_seq = response_seq;
     #info$data_len = data_length;
-    
+
     Log::write(Bsap::LOG_BSAP_IP, info);
-    }   
+    }
 
 ###############################################################################################
 ############### Defines logging of bsap_ip_rdb_response event -> bsap_rdb.log  #################
 ###############################################################################################
-event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: count, 
-                           data_length: count, header_size: count, sequence: count, 
-                           func_code: count, resp_status: count, variables: string, 
+event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: count,
+                           data_length: count, header_size: count, sequence: count,
+                           func_code: count, resp_status: count, variables: string,
                            variable_value: string, variable_cnt: count, data: string)
     {
+    set_service(c);
     local info: BSAP_IP_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -204,15 +214,16 @@ event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: coun
     info$variable_value = variable_value;
     #info$data = data;
     Log::write(Bsap::LOG_BSAP_IP_RDB, info);
-    }   
+    }
 
 ###############################################################################################
 ################ Defines logging of bsap_ip_rdb_request event -> bsap_rdb.log  #################
 ###############################################################################################
-event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count, 
-                        node_status: count, func_code: count, data_length: count, 
+event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count,
+                        node_status: count, func_code: count, data_length: count,
                         var_cnt: count, variables: string, variable_value: string, data: string)
     {
+    set_service(c);
     local info: BSAP_IP_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -234,18 +245,20 @@ event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count
 ###############################################################################################
 event bsap_ip_unknown(c: connection, data: string)
     {
+    set_service(c);
     local info: BSAP_IP_UNKNOWN;
     info$ts  = network_time();
     info$uid = c$uid;
     info$data = data;
     Log::write(Bsap::LOG_BSAP_IP_UNKNOWN, info);
-    } 
+    }
 
 ###############################################################################################
 ############### Defines logging of bsap_local_header event -> bsap_header.log  ################
 ###############################################################################################
 event bsap_serial_local_header(c: connection, SER: count, DFUN: count, SEQ: count, SFUN: count, NSB: count)
     {
+    set_service(c);
     local info: BSAP_SERIAL_HEADER;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -256,16 +269,17 @@ event bsap_serial_local_header(c: connection, SER: count, DFUN: count, SEQ: coun
     info$sfun = app_functions[SFUN];
     info$nsb = NSB;
     info$type_name = "Local Message";
-    
+
     Log::write(Bsap::LOG_BSAP_SERIAL_HEADER, info);
-    }   
+    }
 
 ###############################################################################################
 ############## Defines logging of bsap_global_header event -> bsap_header.log  ################
 ###############################################################################################
-event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: count, CTL: count, DFUN: count,SEQ: count, 
+event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: count, CTL: count, DFUN: count,SEQ: count,
                         SFUN: count, NSB: count)
     {
+    set_service(c);
     local info: BSAP_SERIAL_HEADER;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -279,17 +293,18 @@ event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: co
     info$sfun = app_functions[SFUN];
     info$nsb = NSB;
     info$type_name = "Global Message";
-    
+
     Log::write(Bsap::LOG_BSAP_SERIAL_HEADER, info);
-    }   
+    }
 
 ###############################################################################################
 ############## Defines logging of bsap_rdb_response event -> bsap_cnv_rdb.log  ################
 ###############################################################################################
-event bsap_serial_rdb_response(c: connection, func_code: count, 
+event bsap_serial_rdb_response(c: connection, func_code: count,
                                variable_cnt: count, variables: string,
                                variable_value: string, data: string)
     {
+    set_service(c);
     local info: BSAP_SERIAL_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -299,7 +314,7 @@ event bsap_serial_rdb_response(c: connection, func_code: count,
     info$variable_value = variable_value;
     #info$data = data;
     Log::write(Bsap::LOG_BSAP_SERIAL_RDB, info);
-    }   
+    }
 
 ###############################################################################################
 ############### Defines logging of bsap_rdb_request event -> bsap_cnv_rdb.log  ################
@@ -308,6 +323,7 @@ event bsap_serial_rdb_request(c: connection, func_code: count,
                               variable_cnt: count, variables: string,
                               variable_value: string, data: string)
     {
+    set_service(c);
     local info: BSAP_SERIAL_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -324,6 +340,7 @@ event bsap_serial_rdb_request(c: connection, func_code: count,
 ###############################################################################################
 event bsap_serial_rdb_extension(c: connection, DFUN: count, SEQ: count, SFUN: count, NSB: count, XFUN: count, data: string)
     {
+    set_service(c);
     local info: BSAP_SERIAL_RDB_EXT;
     info$ts  = network_time();
     info$uid = c$uid;
@@ -341,10 +358,10 @@ event bsap_serial_rdb_extension(c: connection, DFUN: count, SEQ: count, SFUN: co
 ###############################################################################################
 event bsap_serial_unknown(c: connection, data: string)
     {
-
+    set_service(c);
     local info: BSAP_SERIAL_UNKNOWN;
     info$ts  = network_time();
     info$uid = c$uid;
     info$data = data;
     Log::write(Bsap::LOG_BSAP_SERIAL_UNKNOWN, info);
-    }     
+    }
