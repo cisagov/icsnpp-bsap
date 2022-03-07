@@ -2,7 +2,6 @@
 # @TEST-EXEC: btest-diff bsap_ip_header.log
 # @TEST-EXEC: btest-diff bsap_ip_rdb.log
 # @TEST-EXEC: btest-diff conn.log
-# @TEST-EXEC: btest-diff dns.log
 #
 # @TEST-DOC: Test BSAP analyzer with small BSAP IP trace.
 
