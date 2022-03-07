@@ -39,8 +39,8 @@ If you are not using site/local.zeek or another site installation of Zeek and ju
 
 ```bash
 git clone https://github.com/cisagov/icsnpp-bsap.git
-zeek -Cr icsnpp-bsap/examples/bsap-ip_example.pcap icsnpp/bsap
-zeek -Cr icsnpp-bsap/examples/bsap-serial_example.pcapng icsnpp/bsap
+zeek -Cr icsnpp-bsap/tests/traces/bsap-ip_example.pcap icsnpp/bsap
+zeek -Cr icsnpp-bsap/tests/traces/bsap-serial_example.pcapng icsnpp/bsap
 ```
 
 ### Manual Install
@@ -73,8 +73,8 @@ To run this plugin in a site deployment you will need to add the line `@load ics
 If you are not using site/local.zeek or another site installation of Zeek and just want to run this package on a packet capture you can add `icsnpp/bsap` to your command to run this plugin's scripts on the packet capture:
 
 ```bash
-zeek -Cr icsnpp-bsap/examples/bsap-ip_example.pcap icsnpp/bsap
-zeek -Cr icsnpp-bsap/examples/bsap-serial_example.pcapng icsnpp/bsap
+zeek -Cr icsnpp-bsap/tests/traces/bsap-ip_example.pcap icsnpp/bsap
+zeek -Cr icsnpp-bsap/tests/traces/bsap-serial_example.pcapng icsnpp/bsap
 ```
 
 If you want to deploy this plugin on an already existing Zeek implementation and you don't want to build the plugin on the machine, you can extract the ICSNPP_Bsap.tgz file to the directory of the established ZEEK_PLUGIN_PATH (default is `${ZEEK_INSTALLATION_DIR}/lib/zeek/plugins/`).
