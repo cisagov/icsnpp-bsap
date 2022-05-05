@@ -112,21 +112,21 @@ The vast majority of BSAP traffic is RDB function traffic. The RDB access is use
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| header_size           | count     | Header length                                             |
-| mes_seq               | count     | Message Sequence                                          |
-| res_seq               | count     | Response Sequence                                         |
-| data_len              | count     | Length of data                                            |
-| sequence              | count     | Function Sequence (Same as Response)                      |
-| app_func_code         | string    | Application function                                      |
-| node_status           | count     | Node Status Byte                                          |
-| func_code             | string    | Application sub function                                  |
-| variable_count        | count     | Variable count in message 								|
-| variables             | string    | String of variables in message 							|
-| variable_value        | string    | String of variable value in message 						|
+| Field                 | Type           | Description                                               |
+| --------------------- |----------------|-----------------------------------------------------------|
+| ts                    | time           | Timestamp                                                 |
+| uid                   | string         | Unique ID for this connection                             |
+| header_size           | count          | Header length                                             |
+| mes_seq               | count          | Message Sequence                                          |
+| res_seq               | count          | Response Sequence                                         |
+| data_len              | count          | Length of data                                            |
+| sequence              | count          | Function Sequence (Same as Response)                      |
+| app_func_code         | string         | Application function                                      |
+| node_status           | count          | Node Status Byte                                          |
+| func_code             | string         | Application sub function                                  |
+| variable_count        | count          | Variable count in message                                 |
+| variables             | vector<string> | Vector of variables in message                            |
+| variable_value        | vector<string> | Vector of variable value in message                       |
 
 
 ### Unknown Log (bsap_ip_unknown.log)
@@ -177,14 +177,13 @@ The vast majority of BSAP traffic is RDB function traffic. The RDB access is use
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| func_code             | string    | RDB function being initiated                              |
-| variable_count        | count     | Variable count in message 								|
-| variables             | string    | String of variables in message 							|
-| variable_value        | string    | String of variable value in message 						|
+| Field                 | Type           | Description                                               |
+| --------------------- |----------------|-----------------------------------------------------------|
+| ts                    | time           | Timestamp                                                 |
+| uid                   | string         | Unique ID for this connection                             |
+| func_code             | string         | RDB function being initiated                              |
+| variables             | vector<string> | Vector of variables in message                            |
+| variable_value        | vector<string> | Vector of variable value in message                       |
 
 
 ### BSAP BSAP_RDB_EXT (Remote Database Access Extended) Log (bsap_serial_rdb_ext.log)

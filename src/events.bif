@@ -28,8 +28,8 @@ event bsap_ip_rdb_request%(c: connection,
                           func_code: count,
                           data_length: count,
                           var_cnt: count,
-                          variables: string,
-                          variable_value: string,
+                          variables: string_vec,
+                          variable_value: string_vec,
                           data: string%);
 
 event bsap_ip_rdb_response%(c: connection,
@@ -40,8 +40,8 @@ event bsap_ip_rdb_response%(c: connection,
                            sequence: count,
                            func_code: count,
                            resp_status: count,
-                           variables: string,
-                           variable_value: string,
+                           variables: string_vec,
+                           variable_value: string_vec,
                            variable_cnt: count,
                            data: string%);
 
@@ -51,15 +51,15 @@ event bsap_ip_unknown%(c: connection,
 event bsap_serial_rdb_request%(c: connection, 
                         func_code: count,
                         variable_cnt: count,
-                        variables: string,
-                        variable_value: string,
+                        variables: string_vec,
+                        variable_value: string_vec,
                         data: string%);
 
 event bsap_serial_rdb_response%(c: connection,
                          func_code: count,
                          variable_cnt: count,
-                         variables: string,
-                         variable_value: string,
+                         variables: string_vec,
+                         variable_value: string_vec,
                          data: string%);
 
 event bsap_serial_local_header%(c: connection, 

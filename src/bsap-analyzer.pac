@@ -12,16 +12,16 @@
      typedef struct RDB_Request {
         uint8 variable_cnt;
         uint8 err;
-        string variable_value;
-        string variables;
+        zeek::VectorValPtr variable_value;
+        zeek::VectorValPtr variables;
 
         RDB_Request(){
             variable_cnt = 0;
             err = 0;
-            variable_value = "";
-            variables = "";
+            auto variable_value = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
+            auto variables = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
         }
-    }RDB_Request;
+    } RDB_Request;
 
     extern string response_addr;
     extern uint8 FuncType;
@@ -135,20 +135,22 @@
                                             {
                                             rdb_request.err = data[z];
                                             z += 1;
+                                            string vname;
                                             do{
-                                                rdb_request.variables += "Errdata 0x";
-                                                rdb_request.variables += HexToString(data, 2, z);
-                                                rdb_request.variables += " ";
+                                                vname  = "Errdata 0x";
+                                                vname += HexToString(data, 2, z);
+                                                vname += " ";
                                                 z += 2;
 
-                                                rdb_request.variables += "Errdata 0x";
-                                                rdb_request.variables += HexToString(data, 2, z);
-                                                rdb_request.variables += " ";
+                                                vname += "Errdata 0x";
+                                                vname += HexToString(data, 2, z);
+                                                vname += " ";
                                                 z += 2;
 
-                                                rdb_request.variables += "Addr 0x";
-                                                rdb_request.variables += HexToString(data, 2, z);
-                                                rdb_request.variables += ", ";
+                                                vname += "Addr 0x";
+                                                vname += HexToString(data, 2, z);
+                                                rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                                              zeek::make_intrusive<zeek::StringVal>(vname));
                                                 z += 2;
 
                                                 if((z > data.length() - 2))
@@ -161,15 +163,17 @@
                                     {
                                         if(z < data.length())
                                             {
+                                            string vname;
                                             do{
-                                                rdb_request.variables += "0x";
-                                                rdb_request.variables += HexToString(data, 2, z);
-                                                rdb_request.variables += " ";
+                                                vname  = "0x";
+                                                vname += HexToString(data, 2, z);
+                                                vname += " ";
                                                 z += 2;
 
-                                                rdb_request.variables += "Addr 0x";
-                                                rdb_request.variables += HexToString(data, 2, z);
-                                                rdb_request.variables += ", ";
+                                                vname += "Addr 0x";
+                                                vname += HexToString(data, 2, z);
+                                                rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                                              zeek::make_intrusive<zeek::StringVal>(vname));
                                                 z += 2;
 
                                                 if((z > data.length() - 2))
@@ -188,6 +192,7 @@
                         for(int i = 0; i < rdb_request.variable_cnt; i++)
                             {
                                 uint8 testval;
+                                string vval = "";
                                 do
                                 {
                                     testval = data[z];
@@ -195,9 +200,9 @@
                                        ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                         {
                                             errset = 1;
-                                            rdb_request.variable_value += "Errdata 0x";
-                                            rdb_request.variable_value += HexToString(data, 1, z);
-                                            rdb_request.variable_value += " ";
+                                            vval += "Errdata 0x";
+                                            vval += HexToString(data, 1, z);
+                                            vval += " ";
 
                                         }
                                     z++;
@@ -211,13 +216,14 @@
                                     z = 2;
                                     do
                                     {
-                                        rdb_request.variable_value += HexToString(data, 1, z);
+                                        vval += HexToString(data, 1, z);
                                         z++;
                                         if((z > data.length() - 2))
                                             break;
                                         }while(data[z] != 0x10 && data[z+1] != 0x03);
                                     }
-                                rdb_request.variable_value += ", ";
+                                rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
+                                                                   zeek::make_intrusive<zeek::StringVal>(vval));
                                 errset = 0;
                             }
                         }
@@ -236,13 +242,15 @@
 
                         if(data[z] == '@')
                             {
+                            string vname = "";
                             do{
-                                rdb_request.variables += data[z];
+                                vname += data[z];
                                 z++;
                                 if((z > data.length()))
                                     break;
                             }while(data[z] != 0x00);
-                            rdb_request.variables += ", ";
+                            rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                          zeek::make_intrusive<zeek::StringVal>(vname));
                             }
                         }
                     }
@@ -270,11 +278,12 @@
                 {
                     if(data.length())
                         {
-                        rdb_request.variable_value = HexToString(data, 2, data.length());
-
+                        string vval = HexToString(data, 2, data.length());
+                        rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
+                                                           zeek::make_intrusive<zeek::StringVal>(vval));
                         }
-                    rdb_request.variables = response_addr;
-
+                    rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                  zeek::make_intrusive<zeek::StringVal>(response_addr));
                 }
                 else
                 {
@@ -289,21 +298,24 @@
                         z = 4;
                         }
 
+                    string vname = "";
+                    string vval = "";
                     for(int i = 0; i < rdb_request.variable_cnt; i++)
                         {
-                        rdb_request.variables += "Addr 0x";
-                        rdb_request.variables += HexToString(data, 2, z);
-                        rdb_request.variables += " ";
+                        vname += "Addr 0x";
+                        vname += HexToString(data, 2, z);
+                        vname += " ";
                         z += 2;
-                        response_addr = rdb_request.variables;
-                        rdb_request.variable_value += HexToString(data, 1, z);
-
-
-
+                        response_addr = vname;
+                        vval += HexToString(data, 1, z)
                         z++;
                         if((z > data.length()))
                             break;
                         }
+                    rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                  zeek::make_intrusive<zeek::StringVal>(vname));
+                    rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
+                                                       zeek::make_intrusive<zeek::StringVal>(vval));
                 }
 
                 break;
@@ -340,6 +352,7 @@
                             uint8 errset = 0;
 
                             uint8 testval;
+                            string vval = "";
                             do
                             {
                                 testval = data[z];
@@ -347,8 +360,8 @@
                                    ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                     {
                                         errset = 1;
-                                        rdb_request.variable_value += "Errdata 0x";
-                                        rdb_request.variable_value += HexToString(data, 1, z);
+                                        vval += "Errdata 0x";
+                                        vval += HexToString(data, 1, z);
                                         z++;
                                     }
                                 z++;
@@ -361,13 +374,14 @@
                                 z = 0;
                                 do
                                 {
-                                    rdb_request.variable_value += HexToString(data, 1, z);
+                                    vval += HexToString(data, 1, z);
                                     z++;
                                     if((z > data.length() - 2))
                                         break;
                                     }while(data[z] != 0x24 && data[z+1] != 0x77);
                                 }
-                            rdb_request.variable_value += ", ";
+                            rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
+                                                               zeek::make_intrusive<zeek::StringVal>(vval));
                             errset = 0;
                             }
                         }
@@ -377,6 +391,7 @@
                         uint8 errset = 0;
 
                         uint8 testval;
+                        string vval = "";
                         do
                         {
                             testval = data[z];
@@ -384,8 +399,8 @@
                                ((testval & 0x40) >> 6 == 1) || ((testval & 0x80) >> 7 == 1))
                                 {
                                     errset = 1;
-                                    rdb_request.variable_value += "Errdata 0x";
-                                    rdb_request.variable_value += HexToString(data, 1, z);
+                                    vval += "Errdata 0x";
+                                    vval += HexToString(data, 1, z);
                                     z++;
                                 }
                             z++;
@@ -398,13 +413,14 @@
                             z = 0;
                             do
                             {
-                                rdb_request.variable_value += HexToString(data, 1, z);
+                                vval += HexToString(data, 1, z);
                                 z++;
                                 if((z > data.length() - 2))
                                     break;
                                 }while(data[z] != 0x10 && data[z+1] != 0x03);
                             }
-                        rdb_request.variable_value += ", ";
+                        rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
+                                                           zeek::make_intrusive<zeek::StringVal>(vval));
                         errset = 0;
 
                         }
@@ -423,13 +439,15 @@
 
                         if(data[z] == '@')
                             {
+                            string vname = "";
                             do{
-                                rdb_request.variables += data[z];
+                                vname += data[z];
                                 z++;
                                 if((z > data.length()))
                                     break;
                             }while(data[z] != 0x00);
-                            rdb_request.variables += ", ";
+                            rdb_request.variables->Assign(rdb_request.variables->Size(),
+                                                          zeek::make_intrusive<zeek::StringVal>(vname));
                             }
                         }
                     }
@@ -555,8 +573,8 @@ refine flow BSAP_Flow += {
                                                              ${bsapip_rdb_request.func_code},
                                                              req_len,
                                                              rdb_request.variable_cnt,
-                                                             zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
-                                                             zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                             std::move(rdb_request.variables),
+                                                             std::move(rdb_request.variable_value),
                                                              to_stringval(${bsapip_rdb_request.data}));
             }
             return true;
@@ -590,8 +608,8 @@ refine flow BSAP_Flow += {
                                                                      ${bsap_response.sequence},
                                                                      response_status,
                                                                      ${bsap_response.resp_status},
-                                                                     zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
-                                                                     zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                     std::move(rdb_request.variables),
+                                                                     std::move(rdb_request.variable_value),
                                                                      ${bsap_response.nme},
                                                                      to_stringval(${bsap_response.data}));
                     }
@@ -673,8 +691,8 @@ refine flow BSAP_Flow += {
                                                                  connection()->zeek_analyzer()->Conn(),
                                                                  ${bsap_serial_rdb_request.func_code},
                                                                  rdb_request.variable_cnt,
-                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
-                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                 std::move(rdb_request.variables),
+                                                                 std::move(rdb_request.variable_value),
                                                                  to_stringval(${bsap_serial_rdb_request.data}));
             }
             return true;
@@ -699,8 +717,8 @@ refine flow BSAP_Flow += {
                                                                  connection()->zeek_analyzer()->Conn(),
                                                                  response_status,
                                                                  rdb_request.variable_cnt,
-                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variables),
-                                                                 zeek::make_intrusive<zeek::StringVal>(rdb_request.variable_value),
+                                                                 std::move(rdb_request.variables),
+                                                                 std::move(rdb_request.variable_value),
                                                                  to_stringval(${bsap_serial_response.data}));
             }
             return true;
