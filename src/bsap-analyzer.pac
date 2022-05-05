@@ -307,7 +307,7 @@
                         vname += " ";
                         z += 2;
                         response_addr = vname;
-                        vval += HexToString(data, 1, z)
+                        vval += HexToString(data, 1, z);
                         z++;
                         if((z > data.length()))
                             break;
