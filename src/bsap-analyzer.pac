@@ -90,8 +90,8 @@
                        uint8 proto_type, const_bytestring data)
         {
         RDB_Request rdb_request;
-        auto rdb_request.variables = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
-        auto rdb_request.variable_value = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
+        auto variables = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
+        auto variable_value = zeek::make_intrusive<zeek::VectorVal>(zeek::id::string_vec);
         uint16 z = 0;
 
         switch(func)
@@ -463,6 +463,8 @@
                 break;
             }
 
+        rdb_request.variables = variables;
+        rdb_request.variable_value = variable_value;
         return rdb_request;
         }
 
