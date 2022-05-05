@@ -151,8 +151,8 @@
 
                                                 vname += "Addr 0x";
                                                 vname += HexToString(data, 2, z);
-                                                rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                                              zeek::make_intrusive<zeek::StringVal>(vname));
+                                                variables->Assign(variables->Size(),
+                                                                  zeek::make_intrusive<zeek::StringVal>(vname));
                                                 z += 2;
 
                                                 if((z > data.length() - 2))
@@ -174,8 +174,8 @@
 
                                                 vname += "Addr 0x";
                                                 vname += HexToString(data, 2, z);
-                                                rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                                              zeek::make_intrusive<zeek::StringVal>(vname));
+                                                variables->Assign(variables->Size(),
+                                                                  zeek::make_intrusive<zeek::StringVal>(vname));
                                                 z += 2;
 
                                                 if((z > data.length() - 2))
@@ -224,8 +224,8 @@
                                             break;
                                         }while(data[z] != 0x10 && data[z+1] != 0x03);
                                     }
-                                rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
-                                                                   zeek::make_intrusive<zeek::StringVal>(vval));
+                                variable_value->Assign(variable_value->Size(),
+                                                       zeek::make_intrusive<zeek::StringVal>(vval));
                                 errset = 0;
                             }
                         }
@@ -251,8 +251,8 @@
                                 if((z > data.length()))
                                     break;
                             }while(data[z] != 0x00);
-                            rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                          zeek::make_intrusive<zeek::StringVal>(vname));
+                            variables->Assign(variables->Size(),
+                                              zeek::make_intrusive<zeek::StringVal>(vname));
                             }
                         }
                     }
@@ -281,11 +281,11 @@
                     if(data.length())
                         {
                         string vval = HexToString(data, 2, data.length());
-                        rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
-                                                           zeek::make_intrusive<zeek::StringVal>(vval));
+                        variable_value->Assign(variable_value->Size(),
+                                               zeek::make_intrusive<zeek::StringVal>(vval));
                         }
-                    rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                  zeek::make_intrusive<zeek::StringVal>(response_addr));
+                    variables->Assign(variables->Size(),
+                                      zeek::make_intrusive<zeek::StringVal>(response_addr));
                 }
                 else
                 {
@@ -314,10 +314,10 @@
                         if((z > data.length()))
                             break;
                         }
-                    rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                  zeek::make_intrusive<zeek::StringVal>(vname));
-                    rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
-                                                       zeek::make_intrusive<zeek::StringVal>(vval));
+                    variables->Assign(variables->Size(),
+                                      zeek::make_intrusive<zeek::StringVal>(vname));
+                    variable_value->Assign(variable_value->Size(),
+                                           zeek::make_intrusive<zeek::StringVal>(vval));
                 }
 
                 break;
@@ -382,8 +382,8 @@
                                         break;
                                     }while(data[z] != 0x24 && data[z+1] != 0x77);
                                 }
-                            rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
-                                                               zeek::make_intrusive<zeek::StringVal>(vval));
+                            variable_value->Assign(variable_value->Size(),
+                                                   zeek::make_intrusive<zeek::StringVal>(vval));
                             errset = 0;
                             }
                         }
@@ -421,8 +421,8 @@
                                     break;
                                 }while(data[z] != 0x10 && data[z+1] != 0x03);
                             }
-                        rdb_request.variable_value->Assign(rdb_request.variable_value->Size(),
-                                                           zeek::make_intrusive<zeek::StringVal>(vval));
+                        variable_value->Assign(variable_value->Size(),
+                                               zeek::make_intrusive<zeek::StringVal>(vval));
                         errset = 0;
 
                         }
@@ -448,8 +448,8 @@
                                 if((z > data.length()))
                                     break;
                             }while(data[z] != 0x00);
-                            rdb_request.variables->Assign(rdb_request.variables->Size(),
-                                                          zeek::make_intrusive<zeek::StringVal>(vname));
+                            variables->Assign(variables->Size(),
+                                              zeek::make_intrusive<zeek::StringVal>(vname));
                             }
                         }
                     }
