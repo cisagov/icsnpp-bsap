@@ -40,20 +40,19 @@ export {
     ################################  BSAP_IP_RDB -> bsap_ip_rdb.log  ################################
     ###############################################################################################
     type BSAP_IP_RDB: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        header_size     : count     &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        mes_seq         : count     &log;
-        res_seq         : count     &log;
-        data_len        : count     &log;
-        sequence        : count     &log;
-        app_func_code   : string    &log;
-        node_status     : count     &log;
-        func_code       : string    &log;
-        variable_count  : count     &log;
-        variables       : string    &log;
-        variable_value  : string    &log;
-        #data            : string    &log;
+        ts              : time              &log;        ## Timestamp for when the event happened.
+        uid             : string            &log;        ## Unique ID for the connection.
+        header_size     : count             &log;        ## The connection's 4-tuple of endpoint addresses/ports.
+        mes_seq         : count             &log;
+        res_seq         : count             &log;
+        data_len        : count             &log;
+        sequence        : count             &log;
+        app_func_code   : string            &log;
+        node_status     : count             &log;
+        func_code       : string            &log;
+        variable_count  : count             &log;
+        variables       : vector of string  &log &optional;
+        variable_value  : vector of string  &log &optional;
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_ip_rdb: event(rec: BSAP_IP_RDB);
@@ -95,13 +94,12 @@ export {
     ###############################################################################################
 
     type BSAP_SERIAL_RDB: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        func_code       : string    &log;
-        variable_count  : count     &log;
-        variables       : string    &log;
-        variable_value  : string    &log;
-        #data            : string    &log;
+        ts              : time              &log;                   ## Timestamp for when the event happened.
+        uid             : string            &log;                   ## Unique ID for the connection.
+        func_code       : string            &log;
+        variable_count  : count             &log;
+        variables       : vector of string  &log &optional;
+        variable_value  : vector of string  &log &optional;
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_serial_rdb: event(rec: BSAP_SERIAL_RDB);
@@ -182,9 +180,6 @@ event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: coun
     info$id  = c$id;
     info$num_msg = Num_Messages;
     info$type_name = msg_types[Message_Func];
-    #info$mes_seq = message_seq;
-    #info$res_seq = response_seq;
-    #info$data_len = data_length;
 
     Log::write(Bsap::LOG_BSAP_IP, info);
     }
@@ -194,8 +189,8 @@ event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: coun
 ###############################################################################################
 event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: count,
                            data_length: count, header_size: count, sequence: count,
-                           func_code: count, resp_status: count, variables: string,
-                           variable_value: string, variable_cnt: count, data: string)
+                           func_code: count, resp_status: count, variables: string_vec,
+                           variable_value: string_vec, variable_cnt: count, data: string)
     {
     set_service(c);
     local info: BSAP_IP_RDB;
@@ -212,7 +207,6 @@ event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: coun
     info$variable_count = variable_cnt;
     info$variables = variables;
     info$variable_value = variable_value;
-    #info$data = data;
     Log::write(Bsap::LOG_BSAP_IP_RDB, info);
     }
 
@@ -221,7 +215,8 @@ event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: coun
 ###############################################################################################
 event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count,
                         node_status: count, func_code: count, data_length: count,
-                        var_cnt: count, variables: string, variable_value: string, data: string)
+                        var_cnt: count, variables: string_vec,
+                        variable_value: string_vec, data: string)
     {
     set_service(c);
     local info: BSAP_IP_RDB;
@@ -236,7 +231,6 @@ event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count
     info$variable_count = var_cnt;
     info$variables = variables;
     info$variable_value = variable_value;
-    #info$data = data;
     Log::write(Bsap::LOG_BSAP_IP_RDB, info);
     }
 
@@ -301,8 +295,8 @@ event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: co
 ############## Defines logging of bsap_rdb_response event -> bsap_cnv_rdb.log  ################
 ###############################################################################################
 event bsap_serial_rdb_response(c: connection, func_code: count,
-                               variable_cnt: count, variables: string,
-                               variable_value: string, data: string)
+                               variable_cnt: count, variables: string_vec,
+                               variable_value: string_vec, data: string)
     {
     set_service(c);
     local info: BSAP_SERIAL_RDB;
@@ -312,7 +306,6 @@ event bsap_serial_rdb_response(c: connection, func_code: count,
     info$variable_count = variable_cnt;
     info$variables = variables;
     info$variable_value = variable_value;
-    #info$data = data;
     Log::write(Bsap::LOG_BSAP_SERIAL_RDB, info);
     }
 
@@ -320,8 +313,8 @@ event bsap_serial_rdb_response(c: connection, func_code: count,
 ############### Defines logging of bsap_rdb_request event -> bsap_cnv_rdb.log  ################
 ###############################################################################################
 event bsap_serial_rdb_request(c: connection, func_code: count,
-                              variable_cnt: count, variables: string,
-                              variable_value: string, data: string)
+                              variable_cnt: count, variables: string_vec,
+                              variable_value: string_vec, data: string)
     {
     set_service(c);
     local info: BSAP_SERIAL_RDB;
@@ -331,7 +324,6 @@ event bsap_serial_rdb_request(c: connection, func_code: count,
     info$variable_count = variable_cnt;
     info$variables = variables;
     info$variable_value = variable_value;
-    #info$data = data;
     Log::write(Bsap::LOG_BSAP_SERIAL_RDB, info);
     }
 
