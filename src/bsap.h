@@ -4,11 +4,12 @@
 #define ANALYZER_PROTOCOL_BSAP_H
 
 #include "events.bif.h"
-#if ZEEK_VERSION_NUMBER >= 40100
+/*#if ZEEK_VERSION_NUMBER >= 40100
 #include <zeek/packet_analysis/protocol/udp/UDPSessionAdapter.h>
 #else
 #include <zeek/analyzer/protocol/udp/UDP.h>
-#endif
+#endif*/
+#include <zeek/analyzer/protocol/udp/UDP.h>
 #include "bsap_pac.h"
 
 namespace analyzer
