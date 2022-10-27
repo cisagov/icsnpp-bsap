@@ -98,6 +98,71 @@
             {
             case READ_SIGNAL_BY_ADDRESS:
 
+                if(proto_type) // serial
+                {
+                    if(req_resp)
+                        rdb_request.variable_cnt = data[1];
+                    else
+                        {
+                        rdb_request.variable_cnt = data[3];
+                        }
+                }
+                else // ip
+                {
+                    if(req_resp)
+                        rdb_request.variable_cnt = cnt;
+                    else
+                        rdb_request.variable_cnt = data[5];
+                }
+
+                if(proto_type) // serial
+                {
+                    if(req_resp)
+                        rdb_request.variable_cnt = data[1];
+                    else
+                        {
+                        rdb_request.variable_cnt = data[3];
+                        }
+                }
+                else // ip
+                {
+                    if(req_resp)
+                    {
+                        rdb_request.variable_cnt = cnt;
+
+                        z = 6;
+                        if(rdb_request.variable_cnt > 0)
+                        {
+                            string vval = "";
+                            for(int i = 0; i < rdb_request.variable_cnt; i++)
+                            {
+                                
+                                vval += HexToString(data, 2, z);
+                                vval += " ";
+                                variable_value->Assign(variables->Size(),
+                                                  zeek::make_intrusive<zeek::StringVal>(vval));
+                                z += 2;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        z = 6;
+                        if(rdb_request.variable_cnt > 0)
+                        {
+                            string vname;
+                            for(int i = 0; i < rdb_request.variable_cnt; i++)
+                            {
+
+                                vname += HexToString(data, 2, z);
+                                vname += " ";
+                                variables->Assign(variable_value->Size(),
+                                                       zeek::make_intrusive<zeek::StringVal>(vname));
+                                z += 2;
+                            }
+                        }
+                    }
+                }
                 break;
             case READ_LOGICAL_BY_ADDRESS:
 
@@ -537,14 +602,14 @@ refine flow BSAP_Flow += {
     function proc_bsapip_request_header(bsapip_request_header: BSAPIP_Request_Header): bool
        %{
             setResponseId(${bsapip_request_header.app_func_code},${bsapip_request_header.sequence},
-                          ${bsapip_request_header.message_seq}, ${bsapip_request_header.data_length});
+                          ${bsapip_request_header.sequence}, ${bsapip_request_header.data_length});
 
             if( :: bsap_ip_request_header)
             {
                 zeek::BifEvent::enqueue_bsap_ip_request_header(connection()->zeek_analyzer(),
                                                                 connection()->zeek_analyzer()->Conn(),
-                                                                ${bsapip_request_header.response_seq},
-                                                                ${bsapip_request_header.message_seq},
+                                                                ${bsapip_request_header.sequence},
+                                                                ${bsapip_request_header.sequence},
                                                                 ${bsapip_request_header.data_length},
                                                                 ${bsapip_request_header.header_size},
                                                                 ${bsapip_request_header.sequence},
@@ -593,7 +658,7 @@ refine flow BSAP_Flow += {
             uint32 app_code = 0;
 
             app_code = getAppFunc();
-            response_status = checkResponse(${bsap_response.response_seq});
+            response_status = checkResponse(${bsap_response.sequence});
 
             RDB_Request rdb_request;
             rdb_request = getRdb(1, ${bsap_response.nme}, (response_status - 0x50), 0, ${bsap_response.data});
@@ -605,10 +670,10 @@ refine flow BSAP_Flow += {
                     {
                        zeek::BifEvent::enqueue_bsap_ip_rdb_response(connection()->zeek_analyzer(),
                                                                      connection()->zeek_analyzer()->Conn(),
-                                                                     ${bsap_response.message_seq},
-                                                                     ${bsap_response.response_seq},
+                                                                     ${bsap_response.sequence},
+                                                                     ${bsap_response.sequence},
                                                                      ${bsap_response.data_length},
-                                                                     ${bsap_response.header_size},
+                                                                     ${bsap_response.data_length},
                                                                      ${bsap_response.sequence},
                                                                      response_status,
                                                                      ${bsap_response.resp_status},

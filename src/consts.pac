@@ -21,6 +21,8 @@ enum command_codes {
     CMD_RESPONSE_1   = 0x0001,
     CMD_RESPONSE     = 0x0005,
     CMD_REQUEST      = 0x0006,
+    CMD_REQUEST_1    = 0x0084,
+    CMD_REQUEST_2    = 0x0086,
 };
 
 enum proto_define {

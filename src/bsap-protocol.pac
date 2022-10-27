@@ -47,7 +47,7 @@ type BSAP_Type = record {
 type TYPE_SWITCH(msg_typ: BSAP_Type) = case msg_typ.proto of {
 
     BSAP_SERIAL                         -> bsapserial:             BSAP_Serial;
-    default                             -> bsapip:                 BSAPIP_Ip;
+    default                             -> bsapip:                 BSAPIP_Ip(msg_typ);
 } 
 
 ## ------------------------------------GET_BSAP_Serial_GLBL_LOCAL-----------------------------------
@@ -335,24 +335,38 @@ type BSAP_Serial_Unknown = record {
 ##      Starts protocol parsing by getting BSAP header and passes processing to either
 ##      BSAP Local or BSAP Global message parsing depending on the ADDR value.
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Header = record {
+type BSAPIP_Header(length: BSAP_Type) = record {
     Num_Messages            : uint16;
     Message_Func            : uint16;
+    data                    : bytestring &length = length.proto-6;
 } &byteorder=littleendian;
 
 ## -----------------------------------------GET_BSAPIP---------------------------------------------
 ## Message Description:
-##      GET_BSAP determines the correct function to process the bsap message.
+##      GET_BSAP determines if the message has data that needs parsing based off of msg count
+## Protocol Parsing:
+##      Pass info to GET_BSAP_CONT to further parse data
+## ------------------------------------------------------------------------------------------------
+type GET_BSAPIP(header: BSAPIP_Header) = case header.Num_Messages of {
+
+    0                                   -> unknown:                     BSAPIP_Unknown;
+    default                             -> keep_parsing:                GET_BSAPIP_CONT(header);
+} 
+
+## ---------------------------------------GET_BSAPIP_CONT------------------------------------------
+## Message Description:
+##      GET_BSAPIP_CONT determines the correct function to process the bsap message.
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Message_Func value
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAPIP(header: BSAPIP_Header) = case header.Message_Func of {
+type GET_BSAPIP_CONT(header: BSAPIP_Header) = case header.Message_Func of {
     CMD_REQUEST                         -> request:                 BSAPIP_Request;
+    CMD_REQUEST_1                       -> request_1:               BSAPIP_Request;
+    CMD_REQUEST_2                       -> request_2:               BSAPIP_Request;
     CMD_RESPONSE                        -> response:                BSAPIP_Response;
-    CMD_RESPONSE_1                      -> response_1:              BSAPIP_Response;
+    #CMD_RESPONSE_1                      -> response_1:              BSAPIP_Response;
     default                             -> unknown:                 BSAPIP_Unknown;
 } 
-
 
 ## ------------------------------------------BSAPIP_Ip-----------------------------------------------
 ## Message Description:
@@ -360,8 +374,8 @@ type GET_BSAPIP(header: BSAPIP_Header) = case header.Message_Func of {
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on GET_BSAPIP 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Ip = record{
-    header                  : BSAPIP_Header;
+type BSAPIP_Ip(length: BSAP_Type) = record{
+    header                  : BSAPIP_Header(length);
     body                    : GET_BSAPIP(header);
 } &let {
     deliver: bool = $context.flow.proc_bsapip_ip_message(this);
@@ -388,8 +402,6 @@ type BSAPIP_Request = record {
 ## Message Description:
 ##      BSAPIP_Request_Header
 ## Message Format:
-##      - response_seq:             uint32              -> Message Response Sequence
-##      - message_seq:              uint32              -> Message Sequence
 ##      - data_length:              uint32              -> Message Length
 ##      - header_size:              uint8               -> Header Length
 ##      - sequence:                 uint32              -> Function sequence 
@@ -398,9 +410,7 @@ type BSAPIP_Request = record {
 ## Protocol Parsing:
 ##      BSAP request header information    
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Request_Header = record {
-    response_seq            : uint32;
-    message_seq             : uint32;
+type BSAPIP_Request_Header = record { # make this a case based off of length seems like either 0x0e or 0x16
     data_length             : uint32;
     header_size             : uint8;
     sequence                : uint32;
@@ -444,10 +454,8 @@ type BSAPIP_RDB_Request = record {
 ## Message Description:
 ##      RDB_Response is remote data base access response to the initiated request.
 ## Message Format:
-##      message_seq:                uint32                  -> Message Sequence
-##      response_seq:               uint32                  -> Message Response Sequence
 ##      data_length:                uint32                  -> Message Length
-##      header_size:                uint8                   -> Header Length
+##      test:                       uint8                   -> Possible ID
 ##      sequence:                   uint32                  -> Function sequence 
 ##      resp_status:                uint8                   -> Response Status
 ##      nme:                        uint8                   -> Number of message elements
@@ -456,11 +464,9 @@ type BSAPIP_RDB_Request = record {
 ##      Parses function code from message and stores rest of message in data to be 
 ##      stored in BSAPIP_cnv_rdb.log file. 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Response = record {
-    message_seq             : uint32;
-    response_seq            : uint32;
+type BSAPIP_Response = record {  #TESTING 0X16 HEADER
     data_length             : uint32;
-    header_size             : uint8;
+    test                    : uint8;
     sequence                : uint32;
     resp_status             : uint8;
     nme                     : uint8;

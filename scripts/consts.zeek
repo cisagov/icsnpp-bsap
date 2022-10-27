@@ -25,6 +25,8 @@ export {
         [0x0001] = "RESPONSECNT",
         [0x0005] = "RESPONSE",
         [0x0006] = "REQUEST",
+        [0x0084] = "REQUEST",
+        [0x0086] = "REQUEST",
     } &default = function(n: count): string {return fmt("Unknown Message Type-0x%02x", n); };
 
 
