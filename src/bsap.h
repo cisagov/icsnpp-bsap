@@ -1,4 +1,4 @@
-r// Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
+// Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
 
 #ifndef ANALYZER_PROTOCOL_BSAP_H
 #define ANALYZER_PROTOCOL_BSAP_H
