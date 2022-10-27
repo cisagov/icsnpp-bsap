@@ -1,15 +1,14 @@
-// Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
+r// Copyright (c) 2020 Battelle Energy Alliance, LLC.  All rights reserved.
 
 #ifndef ANALYZER_PROTOCOL_BSAP_H
 #define ANALYZER_PROTOCOL_BSAP_H
 
 #include "events.bif.h"
-/*#if ZEEK_VERSION_NUMBER >= 40100
+#if ZEEK_VERSION_NUMBER >= 40100
 #include <zeek/packet_analysis/protocol/udp/UDPSessionAdapter.h>
 #else
 #include <zeek/analyzer/protocol/udp/UDP.h>
-#endif*/
-#include <zeek/analyzer/protocol/udp/UDP.h>
+#endif
 #include "bsap_pac.h"
 
 namespace analyzer
