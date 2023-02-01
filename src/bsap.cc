@@ -31,6 +31,6 @@ void BSAP_Analyzer::DeliverPacket(int len, const u_char* data, bool orig, uint64
     }
     catch ( const binpac::Exception& e )
     {
-        ProtocolViolation(zeek::util::fmt("Binpac exception: %s", e.c_msg()));
+        AnalyzerViolation(zeek::util::fmt("Binpac exception: %s", e.c_msg()));
     }
 }
