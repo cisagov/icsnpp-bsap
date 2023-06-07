@@ -3,6 +3,12 @@
 #ifndef ANALYZER_PROTOCOL_BSAP_H
 #define ANALYZER_PROTOCOL_BSAP_H
 
+#if __has_include(<zeek/zeek-version.h>)
+#include <zeek/zeek-version.h>
+#else
+#include <zeek/zeek-config.h>
+#endif
+
 #include "events.bif.h"
 #if ZEEK_VERSION_NUMBER >= 40100
 #include <zeek/packet_analysis/protocol/udp/UDPSessionAdapter.h>
