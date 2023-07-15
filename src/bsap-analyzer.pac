@@ -346,8 +346,8 @@
                     if(data.length())
                         {
                         string vval = HexToString(data, 2, data.length());
-                        variable_value->Assign(variable_value->Size(),
-                                               zeek::make_intrusive<zeek::StringVal>(vval));
+                        //variable_value->Assign(variable_value->Size(),
+                        //                       zeek::make_intrusive<zeek::StringVal>(vval));
                         }
                     variables->Assign(variables->Size(),
                                       zeek::make_intrusive<zeek::StringVal>(response_addr));
