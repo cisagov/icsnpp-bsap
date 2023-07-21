@@ -30,6 +30,11 @@ export {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
         id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ## Source IP Address
+        source_p        : port      &log;                   ## Source Port
+        destination_h   : addr      &log;                   ## Destination IP Address
+        destination_p   : port      &log;                   ## Destination Port
         num_msg         : count     &log;                   ## Number of function calls in message packet
         type_name       : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
@@ -42,6 +47,12 @@ export {
     type BSAP_IP_RDB: record {
         ts              : time              &log;        ## Timestamp for when the event happened.
         uid             : string            &log;        ## Unique ID for the connection.
+        id              : conn_id           &log;        ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool              &log;        ## the message came from the originator/client or the responder/server
+        source_h        : addr              &log;        ## Source IP Address
+        source_p        : port              &log;        ## Source Port
+        destination_h   : addr              &log;        ## Destination IP Address
+        destination_p   : port              &log;        ## Destination Port
         header_size     : count             &log;        ## The connection's 4-tuple of endpoint addresses/ports.
         mes_seq         : count             &log;
         res_seq         : count             &log;
@@ -63,6 +74,12 @@ export {
     type BSAP_IP_UNKNOWN: record {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
+        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ## Source IP Address
+        source_p        : port      &log;                   ## Source Port
+        destination_h   : addr      &log;                   ## Destination IP Address
+        destination_p   : port      &log;                   ## Destination Port
         data            : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
     };
@@ -76,6 +93,11 @@ export {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
         id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ## Source IP Address
+        source_p        : port      &log;                   ## Source Port
+        destination_h   : addr      &log;                   ## Destination IP Address
+        destination_p   : port      &log;                   ## Destination Port
         ser             : count     &log;
         dadd            : count     &log;
         sadd            : count     &log;
@@ -96,6 +118,12 @@ export {
     type BSAP_SERIAL_RDB: record {
         ts              : time              &log;                   ## Timestamp for when the event happened.
         uid             : string            &log;                   ## Unique ID for the connection.
+        id              : conn_id           &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool              &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr              &log;                   ## Source IP Address
+        source_p        : port              &log;                   ## Source Port
+        destination_h   : addr              &log;                   ## Destination IP Address
+        destination_p   : port              &log;                   ## Destination Port
         func_code       : string            &log;
         variable_count  : count             &log;
         variables       : vector of string  &log &optional;
@@ -111,6 +139,12 @@ export {
     type BSAP_SERIAL_RDB_EXT: record {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
+        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ## Source IP Address
+        source_p        : port      &log;                   ## Source Port
+        destination_h   : addr      &log;                   ## Destination IP Address
+        destination_p   : port      &log;                   ## Destination Port
         dfun            : string    &log;
         seq             : count     &log;
         sfun            : string    &log;
@@ -128,6 +162,12 @@ export {
     type BSAP_SERIAL_UNKNOWN: record {
         ts              : time      &log;                   ## Timestamp for when the event happened.
         uid             : string    &log;                   ## Unique ID for the connection.
+        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ## Source IP Address
+        source_p        : port      &log;                   ## Source Port
+        destination_h   : addr      &log;                   ## Destination IP Address
+        destination_p   : port      &log;                   ## Destination Port
         data            : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
     };
@@ -178,6 +218,21 @@ event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: coun
     info$ts  = network_time();
     info$uid = c$uid;
     info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$num_msg = Num_Messages;
     info$type_name = msg_types[Message_Func];
 
@@ -187,7 +242,7 @@ event bsap_ip_header(c: connection, is_orig: bool, id: count, Num_Messages: coun
 ###############################################################################################
 ############### Defines logging of bsap_ip_rdb_response event -> bsap_rdb.log  #################
 ###############################################################################################
-event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: count,
+event bsap_ip_rdb_response(c: connection, is_orig: bool, message_seq: count, response_seq: count,
                            data_length: count, header_size: count, sequence: count,
                            func_code: count, resp_status: count, variables: string_vec,
                            variable_value: string_vec, variable_cnt: count, data: string)
@@ -196,6 +251,22 @@ event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: coun
     local info: BSAP_IP_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$mes_seq = message_seq;
     info$res_seq = response_seq;
     info$data_len = data_length;
@@ -213,7 +284,7 @@ event bsap_ip_rdb_response(c: connection, message_seq: count, response_seq: coun
 ###############################################################################################
 ################ Defines logging of bsap_ip_rdb_request event -> bsap_rdb.log  #################
 ###############################################################################################
-event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count,
+event bsap_ip_rdb_request(c: connection, is_orig: bool, response_seq: count, message_seq: count,
                         node_status: count, func_code: count, data_length: count,
                         var_cnt: count, variables: string_vec,
                         variable_value: string_vec, data: string)
@@ -222,6 +293,22 @@ event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count
     local info: BSAP_IP_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$mes_seq = message_seq;
     info$res_seq = response_seq;
     info$data_len = data_length;
@@ -237,12 +324,28 @@ event bsap_ip_rdb_request(c: connection, response_seq: count, message_seq: count
 ###############################################################################################
 ############## Defines logging of bsap_ip_unknown event -> bsap_ip_unknown.log  ###############
 ###############################################################################################
-event bsap_ip_unknown(c: connection, data: string)
+event bsap_ip_unknown(c: connection, is_orig: bool, data: string)
     {
     set_service(c);
     local info: BSAP_IP_UNKNOWN;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$data = data;
     Log::write(Bsap::LOG_BSAP_IP_UNKNOWN, info);
     }
@@ -250,13 +353,28 @@ event bsap_ip_unknown(c: connection, data: string)
 ###############################################################################################
 ############### Defines logging of bsap_local_header event -> bsap_header.log  ################
 ###############################################################################################
-event bsap_serial_local_header(c: connection, SER: count, DFUN: count, SEQ: count, SFUN: count, NSB: count)
+event bsap_serial_local_header(c: connection, is_orig: bool, SER: count, DFUN: count, SEQ: count, SFUN: count, NSB: count)
     {
     set_service(c);
     local info: BSAP_SERIAL_HEADER;
     info$ts  = network_time();
     info$uid = c$uid;
     info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$ser = SER;
     info$dfun = app_functions[DFUN];
     info$seq = SEQ;
@@ -270,7 +388,7 @@ event bsap_serial_local_header(c: connection, SER: count, DFUN: count, SEQ: coun
 ###############################################################################################
 ############## Defines logging of bsap_global_header event -> bsap_header.log  ################
 ###############################################################################################
-event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: count, CTL: count, DFUN: count,SEQ: count,
+event bsap_serial_global_header(c: connection, is_orig: bool, SER: count, DADD: count, SADD: count, CTL: count, DFUN: count,SEQ: count,
                         SFUN: count, NSB: count)
     {
     set_service(c);
@@ -278,6 +396,21 @@ event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: co
     info$ts  = network_time();
     info$uid = c$uid;
     info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$ser = SER;
     info$dadd = DADD;
     info$sadd = SADD;
@@ -294,7 +427,7 @@ event bsap_serial_global_header(c: connection, SER: count, DADD: count, SADD: co
 ###############################################################################################
 ############## Defines logging of bsap_rdb_response event -> bsap_cnv_rdb.log  ################
 ###############################################################################################
-event bsap_serial_rdb_response(c: connection, func_code: count,
+event bsap_serial_rdb_response(c: connection, is_orig: bool, func_code: count,
                                variable_cnt: count, variables: string_vec,
                                variable_value: string_vec, data: string)
     {
@@ -302,6 +435,22 @@ event bsap_serial_rdb_response(c: connection, func_code: count,
     local info: BSAP_SERIAL_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$func_code = rdb_functions[func_code];
     info$variable_count = variable_cnt;
     info$variables = variables;
@@ -312,7 +461,7 @@ event bsap_serial_rdb_response(c: connection, func_code: count,
 ###############################################################################################
 ############### Defines logging of bsap_rdb_request event -> bsap_cnv_rdb.log  ################
 ###############################################################################################
-event bsap_serial_rdb_request(c: connection, func_code: count,
+event bsap_serial_rdb_request(c: connection, is_orig: bool, func_code: count,
                               variable_cnt: count, variables: string_vec,
                               variable_value: string_vec, data: string)
     {
@@ -320,6 +469,22 @@ event bsap_serial_rdb_request(c: connection, func_code: count,
     local info: BSAP_SERIAL_RDB;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$func_code = rdb_functions[func_code];
     info$variable_count = variable_cnt;
     info$variables = variables;
@@ -330,12 +495,28 @@ event bsap_serial_rdb_request(c: connection, func_code: count,
 ###############################################################################################
 ############ Defines logging of bsap_rdb_extension event -> bsap_cnv_rdb_ext.log  #############
 ###############################################################################################
-event bsap_serial_rdb_extension(c: connection, DFUN: count, SEQ: count, SFUN: count, NSB: count, XFUN: count, data: string)
+event bsap_serial_rdb_extension(c: connection, is_orig: bool, DFUN: count, SEQ: count, SFUN: count, NSB: count, XFUN: count, data: string)
     {
     set_service(c);
     local info: BSAP_SERIAL_RDB_EXT;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$dfun = app_functions[DFUN];
     info$seq = SEQ;
     info$sfun = app_functions[SFUN];
@@ -348,12 +529,28 @@ event bsap_serial_rdb_extension(c: connection, DFUN: count, SEQ: count, SFUN: co
 ###############################################################################################
 ################# Defines logging of bsap_unknown event -> bsap_unknown.log  ##################
 ###############################################################################################
-event bsap_serial_unknown(c: connection, data: string)
+event bsap_serial_unknown(c: connection, is_orig: bool, data: string)
     {
     set_service(c);
     local info: BSAP_SERIAL_UNKNOWN;
     info$ts  = network_time();
     info$uid = c$uid;
+    info$id  = c$id;
+    info$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        info$source_h = c$id$orig_h;
+        info$source_p = c$id$orig_p;
+        info$destination_h = c$id$resp_h;
+        info$destination_p = c$id$resp_p;
+    }else
+    {
+        info$source_h = c$id$resp_h;
+        info$source_p = c$id$resp_p;
+        info$destination_h = c$id$orig_h;
+        info$destination_p = c$id$orig_p;
+    }
     info$data = data;
     Log::write(Bsap::LOG_BSAP_SERIAL_UNKNOWN, info);
     }

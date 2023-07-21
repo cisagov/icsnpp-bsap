@@ -21,7 +21,7 @@
 ## ------------------------------------------------------------------------------------------------
 type BSAP_PDU(is_orig: bool) = record {
     msg_typ                 : BSAP_Type;
-    body                    : TYPE_SWITCH(msg_typ);
+    body                    : TYPE_SWITCH(msg_typ, is_orig);
 } &byteorder=littleendian;
 
 ## -------------------------------------------BSAP_Type--------------------------------------------
@@ -44,10 +44,10 @@ type BSAP_Type = record {
 ## Protocol Parsing:
 ##      Passes parsing to correct protocol target.
 ## ------------------------------------------------------------------------------------------------
-type TYPE_SWITCH(msg_typ: BSAP_Type) = case msg_typ.proto of {
+type TYPE_SWITCH(msg_typ: BSAP_Type, is_orig: bool) = case msg_typ.proto of {
 
-    BSAP_SERIAL                         -> bsapserial:             BSAP_Serial;
-    default                             -> bsapip:                 BSAPIP_Ip(msg_typ);
+    BSAP_SERIAL                         -> bsapserial:             BSAP_Serial(is_orig);
+    default                             -> bsapip:                 BSAPIP_Ip(msg_typ, is_orig);
 } 
 
 ## ------------------------------------GET_BSAP_Serial_GLBL_LOCAL-----------------------------------
@@ -60,10 +60,10 @@ type TYPE_SWITCH(msg_typ: BSAP_Type) = case msg_typ.proto of {
 ## Protocol Parsing:
 ##      Passes processing to either BSAP_Serial_Local or BSAP_Serial_Global based off of header.ADDR
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAP_Serial_GLBL_LOCAL(header: BSAP_Serial_Header) = case (header.ADDR >> 7) of {
-    LOCAL                               -> local:                   BSAP_Serial_Local;
-    GLOBAL                              -> global:                  BSAP_Serial_Global;
-    default                             -> dflt:                    BSAP_Serial_Local;
+type GET_BSAP_Serial_GLBL_LOCAL(header: BSAP_Serial_Header, is_orig: bool) = case (header.ADDR >> 7) of {
+    LOCAL                               -> local:                   BSAP_Serial_Local(is_orig);
+    GLOBAL                              -> global:                  BSAP_Serial_Global(is_orig);
+    default                             -> dflt:                    BSAP_Serial_Local(is_orig);
 } 
 
 ## --------------------------------------------BSAP_Serial_Local-------------------------------------------
@@ -76,9 +76,9 @@ type GET_BSAP_Serial_GLBL_LOCAL(header: BSAP_Serial_Header) = case (header.ADDR 
 ##      Gets header for BSAP Local message and passes header data to function
 ##      GET_BSAP_Serial_LOCAL to determine the function to process the remaining data.
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_Local = record {
-    header                     : BSAP_Serial_Local_Header;
-    body                       : GET_BSAP_Serial_LOCAL(header);
+type BSAP_Serial_Local(is_orig: bool) = record {
+    header                     : BSAP_Serial_Local_Header(is_orig);
+    body                       : GET_BSAP_Serial_LOCAL(header, is_orig);
 } &byteorder=littleendian;
 
 ## --------------------------------------------BSAP_Serial_Global---------------------------------------
@@ -92,9 +92,9 @@ type BSAP_Serial_Local = record {
 ##      Gets header for BSAP Global message and passes header data to function
 ##      GET_BSAP_Serial_GLOBAL to determine the function to process the remaining data.
 ## -----------------------------------------------------------------------------------------------------
-type BSAP_Serial_Global = record {
-    header                     : BSAP_Serial_Global_Header;
-    body                       : GET_BSAP_Serial_GLOBAL(header);
+type BSAP_Serial_Global(is_orig: bool) = record {
+    header                     : BSAP_Serial_Global_Header(is_orig);
+    body                       : GET_BSAP_Serial_GLOBAL(header, is_orig);
 } &byteorder=littleendian;
 
 ## ------------------------------------BSAP_Serial_Local_Header-------------------------------------------
@@ -110,13 +110,14 @@ type BSAP_Serial_Global = record {
 ## Protocol Parsing:
 ##      Bsap Local header data to send to case statement for further processing     
 ## ------------------------------------------------------------------------------------------------------
-type BSAP_Serial_Local_Header = record {
+type BSAP_Serial_Local_Header(is_orig: bool) = record {
     SER                     : uint8;
     DFUN                    : uint8;
     SEQ                     : uint16;
     SFUN                    : uint8;
     NSB                     : uint8;
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsap_serial_local_header(this);
 } &byteorder=littleendian;
 
@@ -135,7 +136,7 @@ type BSAP_Serial_Local_Header = record {
 ## Protocol Parsing:
 ##      Bsap Global header data to send to case statement for further processing
 ## ------------------------------------------------------------------------------------------------------
-type BSAP_Serial_Global_Header = record {
+type BSAP_Serial_Global_Header(is_orig: bool) = record {
     SER                     : uint8;
     DADD                    : uint16;
     SADD                    : uint16;
@@ -145,6 +146,7 @@ type BSAP_Serial_Global_Header = record {
     SFUN                    : uint8;
     NSB                     : uint8;
 }  &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsap_serial_global_header(this);
 } &byteorder=littleendian;
 
@@ -158,9 +160,9 @@ type BSAP_Serial_Global_Header = record {
 ##      Starts protocol parsing by getting BSAP header and passes processing to either
 ##      BSAP Local or BSAP Global message parsing depending on the ADDR value.
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial = record {
+type BSAP_Serial(is_orig: bool) = record {
     header                  : BSAP_Serial_Header;
-    body                    : GET_BSAP_Serial_GLBL_LOCAL(header);
+    body                    : GET_BSAP_Serial_GLBL_LOCAL(header, is_orig);
 } &byteorder=littleendian; 
 
 ## --------------------------------------BSAP_Serial_Header-----------------------------------------
@@ -183,17 +185,17 @@ type BSAP_Serial_Header = record {
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Destination Function (DFUN) command
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAP_Serial_LOCAL(header: BSAP_Serial_Local_Header) = case header.DFUN of {
-    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown;
-    PEI_PC                              -> pei_pc:                  BSAP_Serial_On_Line_PEI_PC_LOCAL(header);
-    DIAG                                -> diag:                    BSAP_Serial_Unknown;
-    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown;
-    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown;
-    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Request;
-    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension;
-    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown;
-    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown;
-    default                             -> poll:                    BSAP_Serial_Unknown;
+type GET_BSAP_Serial_LOCAL(header: BSAP_Serial_Local_Header, is_orig: bool) = case header.DFUN of {
+    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown(is_orig);
+    PEI_PC                              -> pei_pc:                  BSAP_Serial_On_Line_PEI_PC_LOCAL(header, is_orig);
+    DIAG                                -> diag:                    BSAP_Serial_Unknown(is_orig);
+    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown(is_orig);
+    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown(is_orig);
+    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Request(is_orig);
+    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension(is_orig);
+    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown(is_orig);
+    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown(is_orig);
+    default                             -> poll:                    BSAP_Serial_Unknown(is_orig);
 } 
 
 ## ----------------------------------------BSAP_Serial_On_Line_PEI_PC_LOCAL------------------------------------
@@ -202,17 +204,17 @@ type GET_BSAP_Serial_LOCAL(header: BSAP_Serial_Local_Header) = case header.DFUN 
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Source Function (SFUN) command
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_On_Line_PEI_PC_LOCAL(header: BSAP_Serial_Local_Header) = case header.SFUN of {
-    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown;
-    PEI_PC                              -> pei_pc:                  BSAP_Serial_Unknown;
-    DIAG                                -> diag:                    BSAP_Serial_Unknown;
-    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown;
-    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown;
-    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Response;
-    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension;
-    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown;
-    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown;
-    default                             -> poll:                    BSAP_Serial_Unknown;
+type BSAP_Serial_On_Line_PEI_PC_LOCAL(header: BSAP_Serial_Local_Header, is_orig: bool) = case header.SFUN of {
+    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown(is_orig);
+    PEI_PC                              -> pei_pc:                  BSAP_Serial_Unknown(is_orig);
+    DIAG                                -> diag:                    BSAP_Serial_Unknown(is_orig);
+    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown(is_orig);
+    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown(is_orig);
+    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Response(is_orig);
+    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension(is_orig);
+    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown(is_orig);
+    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown(is_orig);
+    default                             -> poll:                    BSAP_Serial_Unknown(is_orig);
 }
 
 ## ----------------------------------------GET_BSAP_Serial_GLOBAL-----------------------------------------
@@ -221,17 +223,17 @@ type BSAP_Serial_On_Line_PEI_PC_LOCAL(header: BSAP_Serial_Local_Header) = case h
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Destination Function (DFUN) command
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAP_Serial_GLOBAL(header: BSAP_Serial_Global_Header) = case header.DFUN of {
-    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown;
-    PEI_PC                              -> pei_pc:                  BSAP_Serial_On_Line_PEI_PC_GLOBAL(header);
-    DIAG                                -> diag:                    BSAP_Serial_Unknown;
-    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown;
-    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown;
-    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Request;
-    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension;
-    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown;
-    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown;
-    default                             -> poll:                    BSAP_Serial_Unknown;
+type GET_BSAP_Serial_GLOBAL(header: BSAP_Serial_Global_Header, is_orig: bool) = case header.DFUN of {
+    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown(is_orig);
+    PEI_PC                              -> pei_pc:                  BSAP_Serial_On_Line_PEI_PC_GLOBAL(header, is_orig);
+    DIAG                                -> diag:                    BSAP_Serial_Unknown(is_orig);
+    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown(is_orig);
+    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown(is_orig);
+    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Request(is_orig);
+    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension(is_orig);
+    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown(is_orig);
+    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown(is_orig);
+    default                             -> poll:                    BSAP_Serial_Unknown(is_orig);
 } 
 
 ## ----------------------------------------BSAP_Serial_On_Line_PEI_PC_GLOBAL-----------------------------------
@@ -240,17 +242,17 @@ type GET_BSAP_Serial_GLOBAL(header: BSAP_Serial_Global_Header) = case header.DFU
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Source Function (SFUN) command
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_On_Line_PEI_PC_GLOBAL(header: BSAP_Serial_Global_Header) = case header.SFUN of {
-    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown;
-    PEI_PC                              -> pei_pc:                  BSAP_Serial_Unknown;
-    DIAG                                -> diag:                    BSAP_Serial_Unknown;
-    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown;
-    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown;
-    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Response;
-    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension;
-    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown;
-    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown;
-    default                             -> poll:                    BSAP_Serial_Unknown;
+type BSAP_Serial_On_Line_PEI_PC_GLOBAL(header: BSAP_Serial_Global_Header, is_orig: bool) = case header.SFUN of {
+    ILLEGAL                             -> illegal:                 BSAP_Serial_Unknown(is_orig);
+    PEI_PC                              -> pei_pc:                  BSAP_Serial_Unknown(is_orig);
+    DIAG                                -> diag:                    BSAP_Serial_Unknown(is_orig);
+    FLASH_DOWNLOAD                      -> flash:                   BSAP_Serial_Unknown(is_orig);
+    FLASH_CONFIG                        -> flashconfig:             BSAP_Serial_Unknown(is_orig);
+    RDB                                 -> remotedatabase:          BSAP_Serial_RDB_Response(is_orig);
+    RDB_EXTENSION                       -> remotedatabaseext:       BSAP_Serial_RDB_Extension(is_orig);
+    RBE_FIRM                            -> reportbyexcpt_firm:      BSAP_Serial_Unknown(is_orig);
+    RBE_MNGR                            -> reportbyexcpt_mang:      BSAP_Serial_Unknown(is_orig);
+    default                             -> poll:                    BSAP_Serial_Unknown(is_orig);
 }
 
 ## --------------------------------------------BSAP_Serial_RDB_Request-----------------------------------------
@@ -263,10 +265,11 @@ type BSAP_Serial_On_Line_PEI_PC_GLOBAL(header: BSAP_Serial_Global_Header) = case
 ##      Parses function code from message and stores rest of message in data to be 
 ##      stored in bsap_cnv_rdb.log file. 
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_RDB_Request = record {
+type BSAP_Serial_RDB_Request(is_orig: bool) = record {
     func_code               : uint8;
-    data                    : bytestring &restofdata;        
+    data                    : bytestring &restofdata;
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsap_serial_rdb_request(this);
 } &byteorder=littleendian;
 
@@ -284,7 +287,7 @@ type BSAP_Serial_RDB_Request = record {
 ## Protocol Parsing:
 ##      Parses data from response message and stores in bsap_cnv_rdb.log file
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_RDB_Extension = record {
+type BSAP_Serial_RDB_Extension(is_orig: bool) = record {
     DFUN                    : uint8;
     SEQ                     : uint16;
     SFUN                    : uint8;
@@ -292,6 +295,7 @@ type BSAP_Serial_RDB_Extension = record {
     XFUN                    : uint16;
     data                    : bytestring &restofdata;  
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsap_serial_rdb_extension(this);
 } &byteorder=littleendian;
 
@@ -303,9 +307,10 @@ type BSAP_Serial_RDB_Extension = record {
 ## Protocol Parsing:
 ##      Parses data from response message and stores in bsap_cnv_rdb.log file
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_RDB_Response = record {
+type BSAP_Serial_RDB_Response(is_orig: bool) = record {
     data                    : bytestring &restofdata;
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsap_serial_response(this);
 } &byteorder=littleendian;
 
@@ -317,8 +322,10 @@ type BSAP_Serial_RDB_Response = record {
 ## Protocol Parsing:
 ##      Parses data from message and stores in bsap_unknown.log file
 ## ------------------------------------------------------------------------------------------------
-type BSAP_Serial_Unknown = record {
+type BSAP_Serial_Unknown(is_orig: bool) = record {
     data                    : bytestring &restofdata;
+} &let {
+    is_originator : bool = is_orig;
 } &byteorder=littleendian;
 
 
@@ -347,10 +354,10 @@ type BSAPIP_Header(length: BSAP_Type) = record {
 ## Protocol Parsing:
 ##      Pass info to GET_BSAP_CONT to further parse data
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAPIP(header: BSAPIP_Header) = case header.Num_Messages of {
+type GET_BSAPIP(header: BSAPIP_Header, is_orig: bool) = case header.Num_Messages of {
 
-    0                                   -> unknown:                     BSAPIP_Unknown;
-    default                             -> keep_parsing:                GET_BSAPIP_CONT(header);
+    0                                   -> unknown:                     BSAPIP_Unknown(is_orig);
+    default                             -> keep_parsing:                GET_BSAPIP_CONT(header, is_orig);
 } 
 
 ## ---------------------------------------GET_BSAPIP_CONT------------------------------------------
@@ -359,13 +366,13 @@ type GET_BSAPIP(header: BSAPIP_Header) = case header.Num_Messages of {
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on Message_Func value
 ## ------------------------------------------------------------------------------------------------
-type GET_BSAPIP_CONT(header: BSAPIP_Header) = case header.Message_Func of {
-    CMD_REQUEST                         -> request:                 BSAPIP_Request;
-    CMD_REQUEST_1                       -> request_1:               BSAPIP_Request;
-    CMD_REQUEST_2                       -> request_2:               BSAPIP_Request;
-    CMD_RESPONSE                        -> response:                BSAPIP_Response;
+type GET_BSAPIP_CONT(header: BSAPIP_Header, is_orig: bool) = case header.Message_Func of {
+    CMD_REQUEST                         -> request:                 BSAPIP_Request(is_orig);
+    CMD_REQUEST_1                       -> request_1:               BSAPIP_Request(is_orig);
+    CMD_REQUEST_2                       -> request_2:               BSAPIP_Request(is_orig);
+    CMD_RESPONSE                        -> response:                BSAPIP_Response(is_orig);
     #CMD_RESPONSE_1                      -> response_1:              BSAPIP_Response;
-    default                             -> unknown:                 BSAPIP_Unknown;
+    default                             -> unknown:                 BSAPIP_Unknown(is_orig);
 } 
 
 ## ------------------------------------------BSAPIP_Ip-----------------------------------------------
@@ -374,10 +381,11 @@ type GET_BSAPIP_CONT(header: BSAPIP_Header) = case header.Message_Func of {
 ## Protocol Parsing:
 ##      Continue with parsing of BSAP message depending on GET_BSAPIP 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Ip(length: BSAP_Type) = record{
+type BSAPIP_Ip(length: BSAP_Type, is_orig: bool) = record{
     header                  : BSAPIP_Header(length);
-    body                    : GET_BSAPIP(header);
+    body                    : GET_BSAPIP(header, is_orig);
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsapip_ip_message(this);
 } &byteorder=littleendian;
 
@@ -393,9 +401,9 @@ type BSAPIP_Ip(length: BSAP_Type) = record{
 ##      Parses BSAP request header data and passes the information to the 
 ##      correct function to finish parsing. 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Request = record {
-    header                  : BSAPIP_Request_Header;
-    body                    : BSAPIP_Get_Request(header);
+type BSAPIP_Request(is_orig: bool) = record {
+    header                  : BSAPIP_Request_Header(is_orig);
+    body                    : BSAPIP_Get_Request(header, is_orig);
 } &byteorder=littleendian;
 
 ## ----------------------------------BSAPIP_Request_Header------------------------------------------
@@ -410,12 +418,13 @@ type BSAPIP_Request = record {
 ## Protocol Parsing:
 ##      BSAP request header information    
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Request_Header = record { # make this a case based off of length seems like either 0x0e or 0x16
+type BSAPIP_Request_Header(is_orig: bool) = record { # make this a case based off of length seems like either 0x0e or 0x16
     data_length             : uint32;
     header_size             : uint8;
     sequence                : uint32;
     app_func_code           : uint8;
 }&let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsapip_request_header(this);
 } &byteorder=littleendian;
 
@@ -426,9 +435,9 @@ type BSAPIP_Request_Header = record { # make this a case based off of length see
 ##      Continue with parsing of BSAP message depending on app_func_code command.
 ##      If function isn't implemented we pass to Unknown to be logged.
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Get_Request(header: BSAPIP_Request_Header) = case header.app_func_code of {
-    RDB                                 -> remotedatabase:          BSAPIP_RDB_Request;
-    default                             -> dflt:                    BSAPIP_Unknown;
+type BSAPIP_Get_Request(header: BSAPIP_Request_Header, is_orig: bool) = case header.app_func_code of {
+    RDB                                 -> remotedatabase:          BSAPIP_RDB_Request(is_orig);
+    default                             -> dflt:                    BSAPIP_Unknown(is_orig);
 }
 
 ## --------------------------------------------BSAPIP_RDB_Request----------------------------------
@@ -442,11 +451,12 @@ type BSAPIP_Get_Request(header: BSAPIP_Request_Header) = case header.app_func_co
 ##      Parses function code from message and stores rest of message in data to be 
 ##      stored in BSAPIP_cnv_rdb.log file. 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_RDB_Request = record {
+type BSAPIP_RDB_Request(is_orig: bool) = record {
     node_status             : uint8;
     func_code               : uint8;
     data                    : bytestring &restofdata;        
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsapip_rdb_request(this);
 } &byteorder=littleendian;
 
@@ -464,7 +474,7 @@ type BSAPIP_RDB_Request = record {
 ##      Parses function code from message and stores rest of message in data to be 
 ##      stored in BSAPIP_cnv_rdb.log file. 
 ## ------------------------------------------------------------------------------------------------
-type BSAPIP_Response = record {  #TESTING 0X16 HEADER
+type BSAPIP_Response(is_orig: bool) = record {  #TESTING 0X16 HEADER
     data_length             : uint32;
     test                    : uint8;
     sequence                : uint32;
@@ -472,12 +482,15 @@ type BSAPIP_Response = record {  #TESTING 0X16 HEADER
     nme                     : uint8;
     data                    : bytestring &restofdata;
 } &let {
+    is_originator : bool = is_orig;
     deliver: bool = $context.flow.proc_bsapip_response(this);
 } &byteorder=littleendian;
 
 
-type BSAPIP_Unknown = record {
+type BSAPIP_Unknown(is_orig: bool) = record {
     data                    : bytestring &restofdata;
-} &byteorder=littleendian;
+} &let {
+    is_originator : bool = is_orig;
+}  &byteorder=littleendian;
 
 

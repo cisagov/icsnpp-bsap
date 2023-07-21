@@ -588,7 +588,7 @@ refine flow BSAP_Flow += {
                 {
                 zeek::BifEvent::enqueue_bsap_ip_header(connection()->zeek_analyzer(),
                                                         connection()->zeek_analyzer()->Conn(),
-                                                        is_orig(),
+                                                        ${bsapip_header.is_originator},
                                                         ${bsapip_header.header.Num_Messages},
                                                         ${bsapip_header.header.Num_Messages},
                                                         ${bsapip_header.header.Message_Func});
@@ -608,6 +608,7 @@ refine flow BSAP_Flow += {
             {
                 zeek::BifEvent::enqueue_bsap_ip_request_header(connection()->zeek_analyzer(),
                                                                 connection()->zeek_analyzer()->Conn(),
+                                                                ${bsapip_request_header.is_originator},
                                                                 ${bsapip_request_header.sequence},
                                                                 ${bsapip_request_header.sequence},
                                                                 ${bsapip_request_header.data_length},
@@ -636,6 +637,7 @@ refine flow BSAP_Flow += {
             {
                 zeek::BifEvent::enqueue_bsap_ip_rdb_request(connection()->zeek_analyzer(),
                                                              connection()->zeek_analyzer()->Conn(),
+                                                             ${bsapip_rdb_request.is_originator},
                                                              response_id,
                                                              message_id,
                                                              ${bsapip_rdb_request.node_status},
@@ -670,6 +672,7 @@ refine flow BSAP_Flow += {
                     {
                        zeek::BifEvent::enqueue_bsap_ip_rdb_response(connection()->zeek_analyzer(),
                                                                      connection()->zeek_analyzer()->Conn(),
+                                                                     ${bsap_response.is_originator},
                                                                      ${bsap_response.sequence},
                                                                      ${bsap_response.sequence},
                                                                      ${bsap_response.data_length},
@@ -696,6 +699,7 @@ refine flow BSAP_Flow += {
             {
                zeek::BifEvent::enqueue_bsap_ip_unknown(connection()->zeek_analyzer(),
                                                         connection()->zeek_analyzer()->Conn(),
+                                                        ${bsapip_unknown.is_originator},
                                                         to_stringval(${bsapip_unknown.data}));
             }
             return true;
@@ -714,6 +718,7 @@ refine flow BSAP_Flow += {
 
                 zeek::BifEvent::enqueue_bsap_serial_local_header(connection()->zeek_analyzer(),
                                                                   connection()->zeek_analyzer()->Conn(),
+                                                                  ${bsap_serial_local_header.is_originator},
                                                                   ${bsap_serial_local_header.SER},
                                                                   ${bsap_serial_local_header.DFUN},
                                                                   ${bsap_serial_local_header.SEQ},
@@ -731,6 +736,7 @@ refine flow BSAP_Flow += {
             {
                 zeek::BifEvent::enqueue_bsap_serial_global_header(connection()->zeek_analyzer(),
                                                                    connection()->zeek_analyzer()->Conn(),
+                                                                   ${bsap_serial_global_header.is_originator},
                                                                    ${bsap_serial_global_header.SER},
                                                                    ${bsap_serial_global_header.DADD},
                                                                    ${bsap_serial_global_header.SADD},
@@ -758,6 +764,7 @@ refine flow BSAP_Flow += {
             {
                 zeek::BifEvent::enqueue_bsap_serial_rdb_request(connection()->zeek_analyzer(),
                                                                  connection()->zeek_analyzer()->Conn(),
+                                                                 ${bsap_serial_rdb_request.is_originator},
                                                                  ${bsap_serial_rdb_request.func_code},
                                                                  rdb_request.variable_cnt,
                                                                  std::move(rdb_request.variables),
@@ -784,6 +791,7 @@ refine flow BSAP_Flow += {
             {
                zeek::BifEvent::enqueue_bsap_serial_rdb_response(connection()->zeek_analyzer(),
                                                                  connection()->zeek_analyzer()->Conn(),
+                                                                 ${bsap_serial_response.is_originator},
                                                                  response_status,
                                                                  rdb_request.variable_cnt,
                                                                  std::move(rdb_request.variables),
@@ -802,6 +810,7 @@ refine flow BSAP_Flow += {
             {
                zeek::BifEvent::enqueue_bsap_serial_rdb_extension(connection()->zeek_analyzer(),
                                                                   connection()->zeek_analyzer()->Conn(),
+                                                                  ${bsap_serial_rdb_extension.is_originator},
                                                                   ${bsap_serial_rdb_extension.DFUN},
                                                                   ${bsap_serial_rdb_extension.SEQ},
                                                                   ${bsap_serial_rdb_extension.SFUN},
@@ -823,6 +832,7 @@ refine flow BSAP_Flow += {
             {
                zeek::BifEvent::enqueue_bsap_serial_unknown(connection()->zeek_analyzer(),
                                                             connection()->zeek_analyzer()->Conn(),
+                                                            ${bsap_serial_unknown.is_originator},
                                                             to_stringval(${bsap_serial_unknown.data}));
             }
             return true;

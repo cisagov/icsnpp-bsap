@@ -8,84 +8,94 @@
 ## Copyright (c) 2023 Battelle Energy Alliance, LLC.  All rights reserved.
 
 event bsap_ip_header%(c: connection,
-                     is_orig: bool,
-                     id: count,
-                     Num_Messages: count,
-                     Message_Func: count%);
+                      is_orig: bool,
+                      id: count,
+                      Num_Messages: count,
+                      Message_Func: count%);
 
 event bsap_ip_request_header%(c: connection,
-                           response_seq: count,
-                           message_seq: count,
-                           data_length: count,
-                           header_size: count,
-                           sequence: count,
-                           app_func_code: count%);
+                              is_orig: bool,
+                              response_seq: count,
+                              message_seq: count,
+                              data_length: count,
+                              header_size: count,
+                              sequence: count,
+                              app_func_code: count%);
 
 event bsap_ip_rdb_request%(c: connection,
-                          response_seq: count,
-                          message_seq: count,
-                          node_status: count,
-                          func_code: count,
-                          data_length: count,
-                          var_cnt: count,
-                          variables: string_vec,
-                          variable_value: string_vec,
-                          data: string%);
-
-event bsap_ip_rdb_response%(c: connection,
-                           message_seq: count,
+                           is_orig: bool,
                            response_seq: count,
-                           data_length: count,
-                           header_size: count,
-                           sequence: count,
+                           message_seq: count,
+                           node_status: count,
                            func_code: count,
-                           resp_status: count,
+                           data_length: count,
+                           var_cnt: count,
                            variables: string_vec,
                            variable_value: string_vec,
-                           variable_cnt: count,
                            data: string%);
 
-event bsap_ip_unknown%(c: connection,
-                      data: string%);
+event bsap_ip_rdb_response%(c: connection,
+                            is_orig: bool,
+                            message_seq: count,
+                            response_seq: count,
+                            data_length: count,
+                            header_size: count,
+                            sequence: count,
+                            func_code: count,
+                            resp_status: count,
+                            variables: string_vec,
+                            variable_value: string_vec,
+                            variable_cnt: count,
+                            data: string%);
 
-event bsap_serial_rdb_request%(c: connection, 
-                        func_code: count,
-                        variable_cnt: count,
-                        variables: string_vec,
-                        variable_value: string_vec,
-                        data: string%);
+event bsap_ip_unknown%(c: connection,
+                       is_orig: bool,
+                       data: string%);
+
+event bsap_serial_rdb_request%(c: connection,
+                               is_orig: bool,
+                               func_code: count,
+                               variable_cnt: count,
+                               variables: string_vec,
+                               variable_value: string_vec,
+                               data: string%);
 
 event bsap_serial_rdb_response%(c: connection,
-                         func_code: count,
-                         variable_cnt: count,
-                         variables: string_vec,
-                         variable_value: string_vec,
-                         data: string%);
+                                is_orig: bool,
+                                func_code: count,
+                                variable_cnt: count,
+                                variables: string_vec,
+                                variable_value: string_vec,
+                                data: string%);
 
-event bsap_serial_local_header%(c: connection, 
-                         SER: count,
-                         DFUN: count,
-                         SEQ: count,
-                         SFUN: count,
-                         NSB: count%);
+event bsap_serial_local_header%(c: connection,
+                                is_orig: bool,
+                                SER: count,
+                                DFUN: count,
+                                SEQ: count,
+                                SFUN: count,
+                                NSB: count%);
 
 event bsap_serial_global_header%(c: connection,
-                          SER: count,
-                          DADD: count,
-                          SADD: count,
-                          CTL: count,
-                          DFUN: count,
-                          SEQ: count, 
-                          SFUN: count,
-                          NSB: count%);
+                                 is_orig: bool,
+                                 SER: count,
+                                 DADD: count,
+                                 SADD: count,
+                                 CTL: count,
+                                 DFUN: count,
+                                 SEQ: count, 
+                                 SFUN: count,
+                                 NSB: count%);
 
 event bsap_serial_rdb_extension%(c: connection,
-                          DFUN: count,
-                          SEQ: count,
-                          SFUN: count,
-                          NSB: count,
-                          XFUN: count,
-                          data: string%);
+                                 is_orig: bool,
+                                 DFUN: count,
+                                 SEQ: count,
+                                 SFUN: count,
+                                 NSB: count,
+                                 XFUN: count,
+                                 data: string%);
 
 event bsap_serial_unknown%(c: connection,
-                    data: string%);
+                           is_orig: bool,
+                           data: string%);

@@ -93,13 +93,18 @@ This log captures BSAP header information for every BSAP packet converted to eth
 
 #### Fields Captured
 
-| Field             | Type      | Description                                               |
-| ----------------- |-----------|-----------------------------------------------------------| 
-| ts                | time      | Timestamp                                                 |
-| uid               | string    | Unique ID for this connection                             |
-| id                | conn_id   | Default Zeek connection info (IP addresses, ports)        |
-| num_msg           | string    | Number of functions per message                           |
-| type_name         | count     | Message Type                                              |
+| Field             | Type      | Description                                                   |
+| ----------------- |-----------|---------------------------------------------------------------|
+| ts                | time      | Timestamp                                                     |
+| uid               | string    | Unique ID for this connection                                 |
+| id                | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig           | bool      | True if the packet is sent from the originator                |
+| source_h          | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p          | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h     | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p     | port      | Destination Port (see *Source and Destination Fields*)        |
+| num_msg           | string    | Number of functions per message                               |
+| type_name         | count     | Message Type                                                  |
 
 
 ### RDB (Remote Database Access) Log (bsap_ip_rdb.log)
@@ -116,6 +121,12 @@ The vast majority of BSAP traffic is RDB function traffic. The RDB access is use
 | --------------------- |----------------|-----------------------------------------------------------|
 | ts                    | time           | Timestamp                                                 |
 | uid                   | string         | Unique ID for this connection                             |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)             |
+| is_orig               | bool      | True if the packet is sent from the originator                 |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)        |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)              |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)   |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)         |
 | header_size           | count          | Header length                                             |
 | mes_seq               | count          | Message Sequence                                          |
 | res_seq               | count          | Response Sequence                                         |
@@ -137,11 +148,17 @@ This log captures all other zeek_bsap_ip traffic that hasn't been defined and lo
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| data                  | string    | BSAP_IP unknown data                                      |
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)        |
+| data                  | string    | BSAP_IP unknown data                                          |
 
 
 ### BSAP Header Log (bsap_serial_header.log)
@@ -152,20 +169,25 @@ This log captures BSAP header information for every BSAP packet converted to Eth
 
 #### Fields Captured
 
-| Field             | Type      | Description                                               |
-| ----------------- |-----------|-----------------------------------------------------------| 
-| ts                | time      | Timestamp                                                 |
-| uid               | string    | Unique ID for this connection                             |
-| id                | conn_id   | Default Zeek connection info (IP addresses, ports)        |
-| ser               | string    | Message Serial Number                                     |
-| dadd              | count     | Destination Address                                       |
-| sadd              | count     | Source Address                                            |
-| ctl               | count     | Control Byte                                              |
-| dfun              | string    | Destination Function                                      |
-| seq               | count     | Message Sequence                                          |
-| sfun              | string    | Source Function                                           |
-| nsb               | count     | Node Status Byte                                          |
-| type_name         | string    | Local or Global header                                    |
+| Field             | Type      | Description                                                   |
+| ----------------- |-----------|---------------------------------------------------------------|
+| ts                | time      | Timestamp                                                     |
+| uid               | string    | Unique ID for this connection                                 |
+| id                | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig           | bool      | True if the packet is sent from the originator                |
+| source_h          | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p          | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h     | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p     | port      | Destination Port (see *Source and Destination Fields*)        |
+| ser               | string    | Message Serial Number                                         |
+| dadd              | count     | Destination Address                                           |
+| sadd              | count     | Source Address                                                |
+| ctl               | count     | Control Byte                                                  |
+| dfun              | string    | Destination Function                                          |
+| seq               | count     | Message Sequence                                              |
+| sfun              | string    | Source Function                                               |
+| nsb               | count     | Node Status Byte                                              |
+| type_name         | string    | Local or Global header                                        |
 
 ### BSAP RDB (Remote Database Access) Log (bsap_serial_rdb.log)
 
@@ -181,6 +203,12 @@ The vast majority of BSAP traffic is RDB function traffic. The RDB access is use
 | --------------------- |----------------|-----------------------------------------------------------|
 | ts                    | time           | Timestamp                                                 |
 | uid                   | string         | Unique ID for this connection                             |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)             |
+| is_orig               | bool      | True if the packet is sent from the originator                 |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)        |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)              |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)   |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)         |
 | func_code             | string         | RDB function being initiated                              |
 | variables             | vector<string> | Vector of variables in message                            |
 | variable_value        | vector<string> | Vector of variable value in message                       |
@@ -196,16 +224,22 @@ These Extension functions of RDB contain information from controllers loading da
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| dfun                  | string    | Destination Function                                      |
-| seq                   | count     | Message Sequence                                          |
-| sfun                  | string    | Source Function                                           |
-| nsb                   | count     | Node Status Byte                                          |
-| extfun                | string    | RDB extension function                                    |
-| data                  | string    | RDB Ext function specific data                            |
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)        |
+| dfun                  | string    | Destination Function                                          |
+| seq                   | count     | Message Sequence                                              |
+| sfun                  | string    | Source Function                                               |
+| nsb                   | count     | Node Status Byte                                              |
+| extfun                | string    | RDB extension function                                        |
+| data                  | string    | RDB Ext function specific data                                |
 
 
 ### BSAP Unknown (bsap_serial_unknown.log)
@@ -216,11 +250,61 @@ This log captures all other BSAP traffic that hasn't been defined and logs it to
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| data                  | string    | BSAP unknown data                                         |
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)        |
+| data                  | string    | BSAP unknown data                                             |
+
+### Source and Destination Fields
+
+#### Overview
+
+Zeek's typical behavior is to focus on and log packets from the originator and not log packets from the responder. However, most ICS protocols contain useful information in the responses, so the ICSNPP parsers log both originator and responses packets. Zeek's default behavior, defined in its `id` struct, is to never switch these originator/responder roles which leads to inconsistencies and inaccuracies when looking at ICS traffic that logs responses.
+
+The default Zeek `id` struct contains the following logged fields:
+* id.orig_h (Original Originator/Source Host)
+* id.orig_p (Original Originator/Source Port)
+* id.resp_h (Original Responder/Destination Host)
+* id.resp_p (Original Responder/Destination Port)
+
+Additionally, the `is_orig` field is a boolean field that is set to T (True) when the id_orig fields are the true originators/source and F (False) when the id_resp fields are the true originators/source.
+
+To not break existing platforms that utilize the default `id` struct and `is_orig` field functionality, the ICSNPP team has added four new fields to each log file instead of changing Zeek's default behavior. These four new fields provide the accurate information regarding source and destination IP addresses and ports:
+* source_h (True Originator/Source Host)
+* source_p (True Originator/Source Port)
+* destination_h (True Responder/Destination Host)
+* destination_p (True Responder/Destination Port)
+
+The pseudocode below shows the relationship between the `id` struct, `is_orig` field, and the new `source` and `destination` fields.
+
+```
+if is_orig == True
+    source_h == id.orig_h
+    source_p == id.orig_p
+    destination_h == id.resp_h
+    destination_p == id.resp_p
+if is_orig == False
+    source_h == id.resp_h
+    source_p == id.resp_p
+    destination_h == id.orig_h
+    destination_p == id.orig_p
+```
+
+#### Example
+
+The table below shows an example of these fields in the log files. The first log in the table represents a Modbus request from 192.168.1.10 -> 192.168.1.200 and the second log represents a Modbus reply from 192.168.1.200 -> 192.168.1.10. As shown in the table below, the `id` structure lists both packets as having the same originator and responder, but the `source` and `destination` fields reflect the true source and destination of these packets.
+
+| id.orig_h    | id.orig_p | id.resp_h     | id.resp_p | is_orig | source_h      | source_p | destination_h | destination_p |
+| ------------ | --------- |---------------|-----------|---------|---------------|----------|---------------|-------------- |
+| 192.168.1.10 | 47785     | 192.168.1.200 | 502       | T       | 192.168.1.10  | 47785    | 192.168.1.200 | 502           |
+| 192.168.1.10 | 47785     | 192.168.1.200 | 502       | F       | 192.168.1.200 | 502      | 192.168.1.10  | 47785         |
 
 ## ICSNPP Packages
 
