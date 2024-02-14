@@ -40,6 +40,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_ip_header: event(rec: BSAP_IP_Header);
+    global log_policy_bsap_ip_header: Log::PolicyHook;
 
     ###############################################################################################
     ################################  BSAP_IP_RDB -> bsap_ip_rdb.log  ################################
@@ -67,6 +68,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_ip_rdb: event(rec: BSAP_IP_RDB);
+    global log_policy_bsap_ip_rdb: Log::PolicyHook;
 
     ###############################################################################################
     ############################  BSAP_IP_UNKNOWN -> bsap_ip_unknown.log  ##########################
@@ -84,6 +86,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_ip_unknown: event(rec: BSAP_IP_UNKNOWN);
+    global log_policy_bsap_ip_unknown: Log::PolicyHook;
 
     ###############################################################################################
     ###########################  BSAP_SERIAL_HEADER -> bsap_serial_header.log  ###########################
@@ -110,6 +113,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_serial_header: event(rec: BSAP_SERIAL_HEADER);
+    global log_policy_bsap_serial_header: Log::PolicyHook;
 
     ###############################################################################################
     ##############################  BSAP_SERIAL_RDB -> bsap_serial_rdb.log  ##############################
@@ -131,6 +135,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_serial_rdb: event(rec: BSAP_SERIAL_RDB);
+    global log_policy_bsap_serial_rdb: Log::PolicyHook;
 
     ###############################################################################################
     #########################  BSAP_SERIAL_RDB_EXT -> bsap_serial_rdb_ext.log  ###########################
@@ -154,6 +159,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_serial_rdb_ext: event(rec: BSAP_SERIAL_RDB_EXT);
+    global log_policy_bsap_serial_rdb_ext: Log::PolicyHook;
 
     ###############################################################################################
     ##########################  BSAP_SERIAL_UNKNOWN -> bsap_serial_unknown.log  ##########################
@@ -172,6 +178,7 @@ export {
         # ## TODO: Add other fields here that you'd like to log.
     };
     global log_bsap_serial_unknown: event(rec: BSAP_SERIAL_UNKNOWN);
+    global log_policy_bsap_serial_unknown: Log::PolicyHook;
 }
 
 #port 1234,1235 are default port numbers used by BSAPIPDRV
@@ -186,14 +193,14 @@ redef likely_server_ports += { ports };
 ###################################################################################################
 event zeek_init() &priority=5
     {
-    Log::create_stream(Bsap::LOG_BSAP_IP, [$columns=BSAP_IP_Header, $ev=log_bsap_ip_header, $path="bsap_ip_header"]);
-    Log::create_stream(Bsap::LOG_BSAP_IP_RDB, [$columns=BSAP_IP_RDB, $ev=log_bsap_ip_rdb, $path="bsap_ip_rdb"]);
-    Log::create_stream(Bsap::LOG_BSAP_IP_UNKNOWN, [$columns=BSAP_IP_UNKNOWN, $ev=log_bsap_ip_unknown, $path="bsap_ip_unknown"]);
+    Log::create_stream(Bsap::LOG_BSAP_IP, [$columns=BSAP_IP_Header, $ev=log_bsap_ip_header, $path="bsap_ip_header", $policy=log_policy_bsap_ip_header]);
+    Log::create_stream(Bsap::LOG_BSAP_IP_RDB, [$columns=BSAP_IP_RDB, $ev=log_bsap_ip_rdb, $path="bsap_ip_rdb", $policy=log_policy_bsap_ip_rdb]);
+    Log::create_stream(Bsap::LOG_BSAP_IP_UNKNOWN, [$columns=BSAP_IP_UNKNOWN, $ev=log_bsap_ip_unknown, $path="bsap_ip_unknown", $policy=log_policy_bsap_ip_unknown]);
 
-    Log::create_stream(Bsap::LOG_BSAP_SERIAL_HEADER, [$columns=BSAP_SERIAL_HEADER, $ev=log_bsap_serial_header, $path="bsap_serial_header"]);
-    Log::create_stream(Bsap::LOG_BSAP_SERIAL_RDB, [$columns=BSAP_SERIAL_RDB, $ev=log_bsap_serial_rdb, $path="bsap_serial_rdb"]);
-    Log::create_stream(Bsap::LOG_BSAP_SERIAL_RDB_EXT, [$columns=BSAP_SERIAL_RDB_EXT, $ev=log_bsap_serial_rdb_ext, $path="bsap_serial_rdb_ext"]);
-    Log::create_stream(Bsap::LOG_BSAP_SERIAL_UNKNOWN, [$columns=BSAP_SERIAL_UNKNOWN, $ev=log_bsap_serial_unknown, $path="bsap_serial_unknown"]);
+    Log::create_stream(Bsap::LOG_BSAP_SERIAL_HEADER, [$columns=BSAP_SERIAL_HEADER, $ev=log_bsap_serial_header, $path="bsap_serial_header", $policy=log_policy_bsap_serial_header]);
+    Log::create_stream(Bsap::LOG_BSAP_SERIAL_RDB, [$columns=BSAP_SERIAL_RDB, $ev=log_bsap_serial_rdb, $path="bsap_serial_rdb", $policy=log_policy_bsap_serial_rdb]);
+    Log::create_stream(Bsap::LOG_BSAP_SERIAL_RDB_EXT, [$columns=BSAP_SERIAL_RDB_EXT, $ev=log_bsap_serial_rdb_ext, $path="bsap_serial_rdb_ext", $policy=log_policy_bsap_serial_rdb_ext]);
+    Log::create_stream(Bsap::LOG_BSAP_SERIAL_UNKNOWN, [$columns=BSAP_SERIAL_UNKNOWN, $ev=log_bsap_serial_unknown, $path="bsap_serial_unknown", $policy=log_policy_bsap_serial_unknown]);
 
     # TODO: If you're using port-based DPD, uncomment this.
     Analyzer::register_for_ports(Analyzer::ANALYZER_BSAP, ports);
