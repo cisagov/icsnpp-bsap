@@ -306,6 +306,20 @@ The table below shows an example of these fields in the log files. The first log
 | 192.168.1.10 | 47785     | 192.168.1.200 | 502       | T       | 192.168.1.10  | 47785    | 192.168.1.200 | 502           |
 | 192.168.1.10 | 47785     | 192.168.1.200 | 502       | F       | 192.168.1.200 | 502      | 192.168.1.10  | 47785         |
 
+## Coverage
+
+See [Logging Capabilities](#logging-capabilities) for detailed information of the parser coverage.
+
+### General/Header Logging
+
+The general BSAP log files (bsap_ip_header.log and bsap_serial_header.log) contains basic header information for all known (~100%) BSAP IP and Serial messages, but provide very little detailed information about the messages.
+
+### Detailed Logging
+
+Detailed logging for BSAP RDB messages are logged in the RDB log files (bsap_ip_rdb.log, bsap_serial_rdb.log, and bsap_serial_rdb_ext.log). These logs contain ~90% logged data for BSAP RDB messages which are the most common BSAP message type.
+
+Non-BSAP RDB messages which commonly account for <10% of BSAP traffic do not contain detailed logging, however, raw data from these other messages are logged in the unknown log files (bsap_ip_unknown.log and bsap_serial_unknown.log).
+
 ## ICSNPP Packages
 
 All ICSNPP Packages:
