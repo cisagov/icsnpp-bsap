@@ -6,7 +6,7 @@
 # Don't edit this. Edit configure.plugin to add plugin-specific options.
 #
 
-#set -e
+set -e
 command="$0 $*"
 
 if [ -e `dirname $0`/configure.plugin ]; then
