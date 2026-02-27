@@ -27,15 +27,15 @@ export {
     #############################  BSAP_IP_Header -> bsap_ip_header.log  ###########################
     ###############################################################################################
     type BSAP_IP_Header: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr      &log;                   ## Source IP Address
-        source_p        : port      &log;                   ## Source Port
-        destination_h   : addr      &log;                   ## Destination IP Address
-        destination_p   : port      &log;                   ## Destination Port
-        num_msg         : count     &log;                   ## Number of function calls in message packet
+        ts              : time      &log;                   ##< Timestamp for when the event happened.
+        uid             : string    &log;                   ##< Unique ID for the connection.
+        id              : conn_id   &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ##< Source IP Address
+        source_p        : port      &log;                   ##< Source Port
+        destination_h   : addr      &log;                   ##< Destination IP Address
+        destination_p   : port      &log;                   ##< Destination Port
+        num_msg         : count     &log;                   ##< Number of function calls in message packet
         type_name       : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
     };
@@ -46,15 +46,15 @@ export {
     ################################  BSAP_IP_RDB -> bsap_ip_rdb.log  ################################
     ###############################################################################################
     type BSAP_IP_RDB: record {
-        ts              : time              &log;        ## Timestamp for when the event happened.
-        uid             : string            &log;        ## Unique ID for the connection.
-        id              : conn_id           &log;        ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool              &log;        ## the message came from the originator/client or the responder/server
-        source_h        : addr              &log;        ## Source IP Address
-        source_p        : port              &log;        ## Source Port
-        destination_h   : addr              &log;        ## Destination IP Address
-        destination_p   : port              &log;        ## Destination Port
-        header_size     : count             &log;        ## The connection's 4-tuple of endpoint addresses/ports.
+        ts              : time              &log;        ##< Timestamp for when the event happened.
+        uid             : string            &log;        ##< Unique ID for the connection.
+        id              : conn_id           &log;        ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool              &log;        ##< the message came from the originator/client or the responder/server
+        source_h        : addr              &log;        ##< Source IP Address
+        source_p        : port              &log;        ##< Source Port
+        destination_h   : addr              &log;        ##< Destination IP Address
+        destination_p   : port              &log;        ##< Destination Port
+        header_size     : count             &log;        ##< The connection's 4-tuple of endpoint addresses/ports.
         mes_seq         : count             &log;
         res_seq         : count             &log;
         data_len        : count             &log;
@@ -74,14 +74,14 @@ export {
     ############################  BSAP_IP_UNKNOWN -> bsap_ip_unknown.log  ##########################
     ###############################################################################################
     type BSAP_IP_UNKNOWN: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr      &log;                   ## Source IP Address
-        source_p        : port      &log;                   ## Source Port
-        destination_h   : addr      &log;                   ## Destination IP Address
-        destination_p   : port      &log;                   ## Destination Port
+        ts              : time      &log;                   ##< Timestamp for when the event happened.
+        uid             : string    &log;                   ##< Unique ID for the connection.
+        id              : conn_id   &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ##< Source IP Address
+        source_p        : port      &log;                   ##< Source Port
+        destination_h   : addr      &log;                   ##< Destination IP Address
+        destination_p   : port      &log;                   ##< Destination Port
         data            : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
     };
@@ -93,14 +93,14 @@ export {
     ###############################################################################################
 
     type BSAP_SERIAL_HEADER: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr      &log;                   ## Source IP Address
-        source_p        : port      &log;                   ## Source Port
-        destination_h   : addr      &log;                   ## Destination IP Address
-        destination_p   : port      &log;                   ## Destination Port
+        ts              : time      &log;                   ##< Timestamp for when the event happened.
+        uid             : string    &log;                   ##< Unique ID for the connection.
+        id              : conn_id   &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ##< Source IP Address
+        source_p        : port      &log;                   ##< Source Port
+        destination_h   : addr      &log;                   ##< Destination IP Address
+        destination_p   : port      &log;                   ##< Destination Port
         ser             : count     &log;
         dadd            : count     &log;
         sadd            : count     &log;
@@ -120,14 +120,14 @@ export {
     ###############################################################################################
 
     type BSAP_SERIAL_RDB: record {
-        ts              : time              &log;                   ## Timestamp for when the event happened.
-        uid             : string            &log;                   ## Unique ID for the connection.
-        id              : conn_id           &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool              &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr              &log;                   ## Source IP Address
-        source_p        : port              &log;                   ## Source Port
-        destination_h   : addr              &log;                   ## Destination IP Address
-        destination_p   : port              &log;                   ## Destination Port
+        ts              : time              &log;                   ##< Timestamp for when the event happened.
+        uid             : string            &log;                   ##< Unique ID for the connection.
+        id              : conn_id           &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool              &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr              &log;                   ##< Source IP Address
+        source_p        : port              &log;                   ##< Source Port
+        destination_h   : addr              &log;                   ##< Destination IP Address
+        destination_p   : port              &log;                   ##< Destination Port
         func_code       : string            &log;
         variable_count  : count             &log;
         variables       : vector of string  &log &optional;
@@ -142,14 +142,14 @@ export {
     ###############################################################################################
 
     type BSAP_SERIAL_RDB_EXT: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr      &log;                   ## Source IP Address
-        source_p        : port      &log;                   ## Source Port
-        destination_h   : addr      &log;                   ## Destination IP Address
-        destination_p   : port      &log;                   ## Destination Port
+        ts              : time      &log;                   ##< Timestamp for when the event happened.
+        uid             : string    &log;                   ##< Unique ID for the connection.
+        id              : conn_id   &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ##< Source IP Address
+        source_p        : port      &log;                   ##< Source Port
+        destination_h   : addr      &log;                   ##< Destination IP Address
+        destination_p   : port      &log;                   ##< Destination Port
         dfun            : string    &log;
         seq             : count     &log;
         sfun            : string    &log;
@@ -166,14 +166,14 @@ export {
     ###############################################################################################
 
     type BSAP_SERIAL_UNKNOWN: record {
-        ts              : time      &log;                   ## Timestamp for when the event happened.
-        uid             : string    &log;                   ## Unique ID for the connection.
-        id              : conn_id   &log;                   ## The connection's 4-tuple of endpoint addresses/ports.
-        is_orig         : bool      &log;                   ## the message came from the originator/client or the responder/server
-        source_h        : addr      &log;                   ## Source IP Address
-        source_p        : port      &log;                   ## Source Port
-        destination_h   : addr      &log;                   ## Destination IP Address
-        destination_p   : port      &log;                   ## Destination Port
+        ts              : time      &log;                   ##< Timestamp for when the event happened.
+        uid             : string    &log;                   ##< Unique ID for the connection.
+        id              : conn_id   &log;                   ##< The connection's 4-tuple of endpoint addresses/ports.
+        is_orig         : bool      &log;                   ##< the message came from the originator/client or the responder/server
+        source_h        : addr      &log;                   ##< Source IP Address
+        source_p        : port      &log;                   ##< Source Port
+        destination_h   : addr      &log;                   ##< Destination IP Address
+        destination_p   : port      &log;                   ##< Destination Port
         data            : string    &log;
         # ## TODO: Add other fields here that you'd like to log.
     };
