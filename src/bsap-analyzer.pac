@@ -55,6 +55,10 @@
         char buf[100];
         int offset = 0;
         int count = 0;
+        if(len == 0 || len > (uint16)((sizeof(buf) - 1 ) / 2 ) || (uint32)pos + (uint32)len > (uint32)data.length() ) 
+        {
+            return string();
+        }
         if(len)
             {
             for(int i = pos; i < pos+len; i++)
@@ -78,7 +82,7 @@
             r_val += buf;
             return r_val;
             }
-        return NULL;
+        return string();
         }
 
     void setFunc(uint8 func)
@@ -339,13 +343,11 @@
 
                 break;
             case WRITE_SIGNAL_BY_ADDRESS:
-
-
                 if(req_resp)
                 {
-                    if(data.length())
+                    if(data.length() >= 2)
                         {
-                        string vval = HexToString(data, 2, data.length());
+                        string vval = HexToString(data, 2, data.length() - 2);
                         //variable_value->Assign(variable_value->Size(),
                         //                       zeek::make_intrusive<zeek::StringVal>(vval));
                         }
